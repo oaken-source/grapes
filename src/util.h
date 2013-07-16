@@ -49,8 +49,8 @@
  * if the given condition is false, set errno to the given errnum and return -1
  */
 #if DEBUG && defined(__GNUC__)
-#  define assert_set_errno(COND, ERRNUM, ...) if(!(COND)) { errno = ERRNUM; error_at_line(EXIT_SUCCESS, errno, __FILE__, __LINE__, __VA_ARGS__); }
-#  define assert_set_errno_ptr(COND, ERRNUM, ...) if(!(COND)) { errno = ERRNUM; error_at_line(EXIT_SUCCESS, errno, __FILE__, __LINE__, __VA_ARGS__); }
+#  define assert_set_errno(COND, ERRNUM, ...) if(!(COND)) { errno = ERRNUM; error_at_line(EXIT_SUCCESS, errno, __FILE__, __LINE__, __VA_ARGS__); return -1; }
+#  define assert_set_errno_ptr(COND, ERRNUM, ...) if(!(COND)) { errno = ERRNUM; error_at_line(EXIT_SUCCESS, errno, __FILE__, __LINE__, __VA_ARGS__); return NULL; }
 #else
 #  define assert_set_errno(COND, ERRNUM, ...) if(!(COND)) { errno = ERRNUM; return -1; }
 #  define assert_set_errno_ptr(COND, ERRNUM, ...) if(!(COND)) { errno = ERRNUM; return NULL; }
