@@ -51,6 +51,8 @@ feedback_error (int status, const char *format, ...)
 
   if(status != EXIT_SUCCESS)
     exit(status);
+
+  errno = 0;
 }
 
 void 
@@ -68,6 +70,8 @@ feedback_warning (const char *format, ...)
     fprintf(stderr, ": %s", strerror(errnum));
 
   fprintf(stderr, "\n");
+
+  errno = 0;
 }
 
 struct feedback_state
