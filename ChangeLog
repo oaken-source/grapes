@@ -1,0 +1,8 @@
+
+2013-11-18  Andreas Grapentin  <andreas@grapentin.org>
+
+	* src/feedback.c: added
+	* src/feedback.h: added
+	* src/file.c: added
+	* src/file.h: added
+	* src/util.h: added
