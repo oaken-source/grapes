@@ -1,8 +1,15 @@
 
 2014-02-14  Andreas Grapentin  <andreas@grapentin.org>
 
+	* src/file.h: file_unmap MAY_FAIL; and changed return value to int
+	* src/file.c: file_map does not fail on mapping empty files, instead
+	return pointer to immutable const char* to empty string
+
+2014-02-14  Andreas Grapentin  <andreas@grapentin.org>
+
 	* src/feedback.c: added conditional include of config.h
 	* src/file.c: likewise
+	* src/file.h: added module description
 
 2013-11-18  Andreas Grapentin  <andreas@grapentin.org>
 

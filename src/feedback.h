@@ -25,8 +25,9 @@
  * a progress meter as well as some convenience error messaging macros.
  */
 
-#include <stdlib.h>
 #include "util.h"
+
+#include <stdlib.h>
 
 #define feedback_assert(COND, ...) do { if(!(COND)) feedback_error(EXIT_FAILURE, __VA_ARGS__); } while (0)
 #define feedback_assert_wrn(COND, ...) do { if(!(COND)) feedback_warning(__VA_ARGS__); } while (0)
