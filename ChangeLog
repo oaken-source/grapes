@@ -1,4 +1,9 @@
 
+2014-02-14  Andreas Grapentin  <andreas@grapentin.org>
+
+	* src/feedback.c: added conditional include of config.h
+	* src/file.c: likewise
+
 2013-11-18  Andreas Grapentin  <andreas@grapentin.org>
 
 	* src/feedback.c: added
