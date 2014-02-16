@@ -1,4 +1,10 @@
 
+2014-02-16  Andreas Grapentin  <andreas@grapentin.org>
+
+	* src/feedback.h: added functions to configure the print-prefix of
+	errors and warnings.
+	* src/feedbach.c: likewise, default prefixes are now empty
+
 2014-02-14  Andreas Grapentin  <andreas@grapentin.org>
 
 	* src/file.h: file_unmap MAY_FAIL; and changed return value to int
