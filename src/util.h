@@ -21,7 +21,12 @@
 
 #pragma once
 
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 #include <errno.h>
+#include <error.h>
 #include <stdlib.h>
 
 /* sanitize common macro definitions */
@@ -34,10 +39,10 @@ void feedback_error_at_line(const char *filename, unsigned int linenum, const ch
 
 /* assertion macros - define hell incoming!
  *
- * these macros have different flavours and should be used in different 
+ * these macros have different flavours and should be used in different
  * situations, where errors that occur are handed back to through the call
  * stack. Each of these functions has printf-like behaviour, if DEBUG has been
- * defined by the calling application, printing a formatted error message to 
+ * defined by the calling application, printing a formatted error message to
  * stderr, with varying additional behaviour as described below:
  *
  * assert_inner:
@@ -53,7 +58,7 @@ void feedback_error_at_line(const char *filename, unsigned int linenum, const ch
 #  define assert_inner(COND, ...) do { if(!(COND)) { feedback_error_at_line(__FILE__, __LINE__, __VA_ARGS__); return -1; } } while (0)
 #  define assert_inner_ptr(COND, ...) do { if(!(COND)) { feedback_error_at_line(__FILE__, __LINE__, __VA_ARGS__); return NULL; } } while (0)
 #  define assert_set_errno(COND, ERRNUM, ...) do { if(!(COND)) { errno = ERRNUM; feedback_error_at_line(__FILE__, __LINE__, __VA_ARGS__); return -1; } } while (0)
-#  define assert_set_errno_ptr(COND, ERRNUM, ...) do { if(!(COND)) { errno = ERRNUM; feedback_error_at_line(__FILE__, __LINE__, __VA_ARGS__); return NULL; } } while (0) 
+#  define assert_set_errno_ptr(COND, ERRNUM, ...) do { if(!(COND)) { errno = ERRNUM; feedback_error_at_line(__FILE__, __LINE__, __VA_ARGS__); return NULL; } } while (0)
 #else
 #  define assert_inner(COND, ...) do { if(!(COND)) return -1; } while (0)
 #  define assert_inner_ptr(COND, ...) do { if(!(COND)) return NULL; } while (0)

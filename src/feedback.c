@@ -19,10 +19,6 @@
  ******************************************************************************/
 
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
-
 #include "feedback.h"
 
 #include <stdarg.h>
@@ -43,7 +39,7 @@ feedback_error_at_line (const char *filename, unsigned int linenum, const char *
 {
   int errnum = errno;
     fprintf(stderr, "%s:%s:%u: ", program_invocation_name, filename, linenum);
-  
+
   va_list args;
   va_start(args, format);
   vfprintf(stderr, format, args);
@@ -85,14 +81,14 @@ feedback_set_error_prefix (const char *format, ...)
   return 0;
 }
 
-void 
+void
 feedback_error (int status, const char *format, ...)
 {
   int errnum = errno;
 
   if (feedback_error_prefix)
     fprintf(stderr, "%s", feedback_error_prefix);
-  
+
   va_list args;
   va_start(args, format);
   vfprintf(stderr, format, args);
@@ -137,7 +133,7 @@ feedback_set_warning_prefix (const char *format, ...)
   return 0;
 }
 
-void 
+void
 feedback_warning (const char *format, ...)
 {
   int errnum = errno;
@@ -171,7 +167,7 @@ static struct feedback_state state = { 0, 0, 0, 0, 0 };
 
 char spinner[] = { '\\', '|', '/', '-' };
 
-void 
+void
 feedback_progress_out ()
 {
   if(state.max)
@@ -181,7 +177,7 @@ feedback_progress_out ()
   fflush(stdout);
 }
 
-void 
+void
 feedback_progress_start (const char *tag, unsigned long max)
 {
   if(state.running)
@@ -196,7 +192,7 @@ feedback_progress_start (const char *tag, unsigned long max)
   feedback_progress_out();
 }
 
-void 
+void
 feedback_progress_inc ()
 {
   if(state.running)
@@ -222,7 +218,7 @@ feedback_progress_inc ()
     }
 }
 
-void 
+void
 feedback_progress_finish ()
 {
   if(state.running)
