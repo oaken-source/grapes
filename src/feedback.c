@@ -40,7 +40,7 @@ void
 feedback_error_at_line (const char *filename, unsigned int linenum, const char *format, ...)
 {
   int errnum = errno;
-  fprintf(stderr, "%s:%s:%u: ", program_invocation_name, filename, linenum);
+  fprintf(stderr, "%s:%s:%u: error:", program_invocation_name, filename, linenum);
 
   va_list args;
   va_start(args, format);
