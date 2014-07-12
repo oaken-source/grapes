@@ -68,16 +68,10 @@ void feedback_error_at_line(const char *filename, unsigned int linenum, const ch
 
 /* convenience attribute shortcuts with semantic sugar */
 #ifdef __GNUC__
-#  define MAY_FAIL __attribute__((warn_unused_result))
-#  define UNUSED   __attribute__((unused))
+#  define may_fail __attribute__((warn_unused_result))
+#  define unused   __attribute__((unused))
 #else
-#  define MAY_FAIL
-#  define UNUSED
+#  define may_fail
+#  define unused
 #endif
-
-/* subset of available ANSI color escape codes */
-#define YELLOW	"\033[1;33m"
-#define GREEN	"\033[1;32m"
-#define RED	"\033[1;31m"
-#define NORMAL	"\033[0m"
 
