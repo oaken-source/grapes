@@ -79,10 +79,12 @@ void feedback_error_at_line(const char *filename, unsigned int linenum, const ch
 
 /* convenience attribute shortcuts with semantic sugar */
 #ifdef __GNUC__
-#  define may_fail __attribute__((warn_unused_result))
-#  define unused   __attribute__((unused))
+#  define may_fail    __attribute__((warn_unused_result))
+#  define unused      __attribute__((unused))
+#  define debug_func  __attribute__((deprecated))
 #else
 #  define may_fail
 #  define unused
+#  define debug_func
 #endif
 
