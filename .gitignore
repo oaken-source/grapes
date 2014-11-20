@@ -31,3 +31,4 @@ integrate.sh
 
 # binaries
 tests/fdispatch
+leakcheck/leakcheck

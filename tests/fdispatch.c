@@ -33,9 +33,9 @@
 static unsigned int steps_passed = 0;
 static unsigned int steps_failed = 0;
 
-#define ASSERT(COND, ...)   do { if (!(COND)) { FAIL(__VA_ARGS__); return; } } while (0)
-#define PASS(MSG)           do { ++steps_passed; printf("C_PASS: %s\n", MSG); } while (0)
-#define FAIL(...)           do { ++steps_failed; feedback_error(EXIT_SUCCESS, __VA_ARGS__); } while (0)
+#define ASSERT(COND, ...) do { if (!(COND)) { FAIL(__VA_ARGS__); return; } } while (0)
+#define PASS(MSG)         do { ++steps_passed; printf("C_PASS: %s\n", MSG); } while (0)
+#define FAIL(...)         do { ++steps_failed; feedback_error(EXIT_SUCCESS, "C_FAIL" __VA_ARGS__); } while (0)
 
 static void
 test_feedback_assert(int argc, char *argv[])

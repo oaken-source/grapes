@@ -13,7 +13,8 @@ EXTRA_DIST =  asparagus.exp \
 	      static/file.txt static/empty.txt \
 	      grapes-feedback.tests/feedback.exp \
 	      grapes-file.tests/file.exp \
-	      grapes-util.tests/util.exp
+	      grapes-util.tests/util.exp \
+	      grapes-vector.tests/vector.exp
 
 AUTOMAKE_OPTIONS = dejagnu
 
