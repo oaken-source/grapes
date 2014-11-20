@@ -3,4 +3,10 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = src docs tests leakcheck
+SUBDIRS = src docs tests
+
+if PROFILING
+
+SUBDIRS += leakcheck
+
+endif ## PROFILING
