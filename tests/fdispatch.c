@@ -28,16 +28,17 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 static unsigned int steps_passed = 0;
 static unsigned int steps_failed = 0;
 
-#define ASSERT(COND, MSG)   do { if (!(COND)) FAIL(MSG) } while (0)
-#define PASS(MSG)           do { ++steps_passed; printf("PASS: %s\n" MSG); } while (0)
-#define FAIL(MSG)           do { ++steps_failed; printf("FAIL: %s\n" MSG); } while (0)
+#define ASSERT(COND, ...)   do { if (!(COND)) { FAIL(__VA_ARGS__); return; } } while (0)
+#define PASS(MSG)           do { ++steps_passed; printf("C_PASS: %s\n", MSG); } while (0)
+#define FAIL(...)           do { ++steps_failed; feedback_error(EXIT_SUCCESS, __VA_ARGS__); } while (0)
 
 static void
-test_feedback_assert(int argc, unused char *argv[])
+test_feedback_assert(int argc, char *argv[])
 {
   int cond = 0;
   char *msg = NULL;
@@ -51,7 +52,7 @@ test_feedback_assert(int argc, unused char *argv[])
 }
 
 static void
-test_feedback_assert_wrn(int argc, unused char *argv[])
+test_feedback_assert_wrn(int argc, char *argv[])
 {
   int cond = 0;
   char *msg = NULL;
@@ -65,7 +66,7 @@ test_feedback_assert_wrn(int argc, unused char *argv[])
 }
 
 static void
-test_feedback_error_at_line(unused int argc, unused char *argv[])
+test_feedback_error_at_line(int argc, char *argv[])
 {
   char *filename = NULL;
   unsigned int linenum = 0;
@@ -81,7 +82,7 @@ test_feedback_error_at_line(unused int argc, unused char *argv[])
 }
 
 static void
-test_feedback_error(unused int argc, unused char *argv[])
+test_feedback_error(int argc, char *argv[])
 {
   int status = 0;
   char *msg = NULL;
@@ -95,7 +96,7 @@ test_feedback_error(unused int argc, unused char *argv[])
 }
 
 static void
-test_feedback_warning(unused int argc, unused char *argv[])
+test_feedback_warning(int argc, char *argv[])
 {
   char *msg = NULL;
   unsigned int param = 0;
@@ -104,6 +105,61 @@ test_feedback_warning(unused int argc, unused char *argv[])
   if (argc > 1) param = strtol(argv[1], NULL, 10);
 
   feedback_warning("%s :: %u", msg, param);
+}
+
+static void
+test_file_map(int argc, char *argv[])
+{
+  char *filename = NULL;
+
+  if (argc > 0) filename = argv[0];
+
+  size_t length;
+  char *data = file_map(filename, &length);
+  ASSERT(data, "%s", filename);
+
+  printf(" ** length is: %zu **\n", length);
+  printf("%s\n", data);
+}
+
+static void
+test_file_unmap(int argc, char *argv[])
+{
+  char *prefix = NULL;
+
+  if (argc > 0) prefix = argv[0];
+
+  char filename[256] = { 0 };
+
+  size_t length;
+  // file_unmap should succeed for successfully mapped files
+  // FIXME: this breaks on long prefixes.
+  sprintf(filename, "%s/static/file.txt", prefix);
+  char *data = file_map(filename, &length);
+  ASSERT(data, "file_map");
+  int res = file_unmap(data, length);
+  ASSERT(!res, "file_unmap");
+  PASS("unmapping mapped files");
+
+  // file_unmap should succeed for mapped empty files
+  sprintf(filename, "%s/static/empty.txt", prefix);
+  data = file_map(filename, &length);
+  ASSERT(data, "file_map");
+  res = file_unmap(data, length);
+  ASSERT(!res, "file_unmap");
+  PASS("unmapping mapped empty files");
+
+  // file_unmap should succeed for pointer returned by failed maps
+  sprintf(filename, "%s/static/nonexistant.txt", prefix);
+  data = file_map(filename, &length);
+  res = file_unmap(data, length);
+  ASSERT(!res, "file_unmap");
+  PASS("unmapping files whose map failed");
+
+  // file_unmap should succeed for NULL pointers
+  res = file_unmap(NULL, 123);
+  ASSERT(!res, "file_unmap");
+  PASS("unmapping a NULL pointer");
 }
 
 #undef  ASSERT
@@ -123,6 +179,9 @@ main (int argc, char *argv[])
   test_setup(feedback_error_at_line);
   test_setup(feedback_error);
   test_setup(feedback_warning);
+
+  test_setup(file_map);
+  test_setup(file_unmap);
 
 #undef  test_setup
 

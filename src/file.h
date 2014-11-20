@@ -21,7 +21,7 @@
 
 #pragma once
 
-/* This is a convenience wrapper for the frequently used but combersome mmap
+/* This is a convenience wrapper for the frequently used but cumbersome mmap
  * function.
  */
 

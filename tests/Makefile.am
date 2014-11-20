@@ -10,7 +10,10 @@ AM_CFLAGS += -I${top_srcdir}
 EXTRA_DIST =  asparagus.exp \
               lib/feedback.tcl lib/string.tcl \
               steps/dispatcher.tcl steps/default.tcl \
-	      grapes-feedback.tests/feedback.exp
+	      static/file.txt static/empty.txt \
+	      grapes-feedback.tests/feedback.exp \
+	      grapes-file.tests/file.exp \
+	      grapes-util.tests/util.exp
 
 AUTOMAKE_OPTIONS = dejagnu
 
