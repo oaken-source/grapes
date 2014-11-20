@@ -3,10 +3,10 @@
 
 lib_LTLIBRARIES = libgrapes.la
 
-libgrapes_la_SOURCES = feedback.c file.c
+libgrapes_la_SOURCES = feedback.c file.c vector.c
 
 libgrapes_la_includedir = $(includedir)/grapes
-libgrapes_la_include_HEADERS = feedback.h file.h util.h
+libgrapes_la_include_HEADERS = feedback.h file.h vector.h util.h
 
 ## see http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html for an updating guide
 libgrapes_la_LDFLAGS = -version-info 0:0:0
