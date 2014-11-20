@@ -29,7 +29,7 @@
 # include <config.h>
 #endif
 
-#include "util.h"
+#include <grapes/util.h>
 
 #include <stdlib.h>
 

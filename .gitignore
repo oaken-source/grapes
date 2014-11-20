@@ -18,5 +18,10 @@ m4/l*
 **/Makefile
 **/Makefile.in
 
+# runtest generated files
+*.log
+*.sum
+site.*
+
 # locally used scripts
 integrate.sh
