@@ -83,13 +83,27 @@ test_feedback_error_at_line(unused int argc, unused char *argv[])
 static void
 test_feedback_error(unused int argc, unused char *argv[])
 {
+  int status = 0;
+  char *msg = NULL;
+  unsigned int param = 0;
 
+  if (argc > 0) status = strtol(argv[0], NULL, 10);
+  if (argc > 1) msg = argv[1];
+  if (argc > 2) param = strtol(argv[2], NULL, 10);
+
+  feedback_error(status, "%s :: %u", msg, param);
 }
 
 static void
 test_feedback_warning(unused int argc, unused char *argv[])
 {
+  char *msg = NULL;
+  unsigned int param = 0;
 
+  if (argc > 0) msg = argv[0];
+  if (argc > 1) param = strtol(argv[1], NULL, 10);
+
+  feedback_warning("%s :: %u", msg, param);
 }
 
 #undef  ASSERT
