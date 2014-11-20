@@ -13,9 +13,10 @@ configure
 libtool
 scripts/
 stamp-h1
+m4/l*
 
 **/Makefile
 **/Makefile.in
 
-# misc
-*.sh
+# locally used scripts
+integrate.sh
