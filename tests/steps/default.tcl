@@ -21,157 +21,272 @@
  # This is the list of default steps provided by asparagus.
  ##############################################################################
 
-proc given_an_executable { exe args } {
 
-  pass_step "Given an executable `$exe'"
+### given an executable ?exe?
+#
+# sets the global `asparagus_executable_path` to the given path and passes.
+proc given_an_executable { exe } {
 
-  dispatch_statement "$exe" 0 "given" {*}"$args"
+  global asparagus_executable_path
 
-  send_user "\n"
+  set asparagus_executable_path "$exe"
+
+  pass_step
 
 }
+asparagus_register_step given_an_executable "given an executable"
 
-proc when_I_run_with_parameters { exe pid prefix parameters args } {
+### when I run with parameters ?parameters?
+#
+# spawns the executable stored in `asparagus_executable_path`, which should be
+# set by `given an executable`, with the given cli parameters and stores the
+# spawn id in the global variable `asparagus_spawn_id`.
+#
+# If the spawn command throws an error, the step fails, otherwise is passes
+proc when_I_run_with_parameters { parameters } {
 
-  if { [ catch { spawn $exe {*}$parameters } ] } {
-    fail_step "  $prefix I run with parameters `$parameters'"
+  global asparagus_executable_path
+  global asparagus_spawn_id
+
+  set asparagus_spawn_id ""
+
+  if { [ catch { spawn $asparagus_executable_path {*}$parameters } msg ] } {
+    fail_step "$msg"
     return
-  } else {
-    pass_step "  $prefix I run with parameters `$parameters'"
   }
 
   # give the program a bit of time
   after 10
 
-  dispatch_statement "$exe" $spawn_id "when" {*}"$args"
+  set asparagus_spawn_id "$spawn_id"
+
+  pass_step
 
 }
+asparagus_register_step when_I_run_with_parameters "when I run with parameters"
 
-proc when_I_run { exe pid prefix args } {
+### when I run
+#
+# spawns the executable stored in `asparagus_executable_path`, which should be
+# set by `given an executable`, and stores the spawn id in the global variable
+# `asparagus_spawn_id`.
+#
+# If the spawn command throws an error, the step fails, otherwise it passes
+proc when_I_run { } {
 
-  if { [ catch { spawn $exe } ] } {
-    fail_step "  $prefix I run"
+  global asparagus_executable_path
+  global asparagus_spawn_id
+
+  set asparagus_spawn_id ""
+
+  if { [ catch { spawn $asparagus_executable_path } msg ] } {
+    fail_step "$msg"
     return
-  } else {
-    pass_step "  $prefix I run"
   }
 
   # give the program a bit of time
   after 10
 
-  dispatch_statement "$exe" $spawn_id "when" {*}"$args"
+  set asparagus_spawn_id "$spawn_id"
+
+  pass_step
 
 }
+asparagus_register_step when_I_run "when I run"
 
-proc when_I_send { exe pid prefix str args } {
+### when I send ?string?
+#
+# send input to stdin of the process identified by the global variable
+# `asparagus_spawn_id`, which should be set by the `when I run` step family.
+#
+# If the send throws an error, the step fails, otherwise it passes
+proc when_I_send { str } {
 
-  set spawn_id $pid
+  global asparagus_spawn_id
 
-  send "$str"
+  if { ! [ string length $asparagus_spawn_id ] } {
+    fail_step "not open"
+    return
+  }
 
-  pass_step "  $prefix I send `[ string trim $str ]'"
+  set spawn_id "$asparagus_spawn_id"
 
-  dispatch_statement "$exe" $pid "when" {*}"$args"
+  if { [ catch { send "$str" } msg ] } {
+    fail_step "$msg"
+    return
+  }
+
+  pass_step
 
 }
+asparagus_register_step when_I_send "when I send"
 
-proc then_I_should_see { exe pid prefix str args } {
+### then I should see ?string?
+#
+# expect output from the process identified by the global variable
+# `asparagus_spawn_id`, which should by set by the `when I run` step family.
+#
+# If the expect throws an error or the string is not seen, the step fails,
+# otherwise it passes.
+proc then_I_should_see { str } {
 
-  set spawn_id $pid
-  expect {
+  global asparagus_spawn_id
 
-    "$str" {
-      pass_step "  $prefix I should see `$str'"
-    }
+  if { ! [ string length $asparagus_spawn_id ] } {
+    fail_step "not open"
+    return
+  }
 
+  set spawn_id "$asparagus_spawn_id"
+
+  if { [ catch { expect {
+
+    "$str" { }
     default {
-      fail_step "  $prefix I should see `$str'"
+      fail_step "not seen"
       return
     }
 
+  } } msg ] } {
+    fail_step "$msg"
+    return
   }
 
-  dispatch_statement "$exe" $pid "then" {*}"$args"
+  pass_step
 
 }
+asparagus_register_step then_I_should_see "then I should see"
 
-proc then_I_should_not_see { exe pid prefix str args } {
+### then I should not see ?string?
+#
+# expect output from the process identified by the global variable
+# `asparagus_spawn_id`, which should be set by the `when I run` step family.
+#
+# If the expect throws an error, or the string is seen, the step fails,
+# otherwise it passes.
+proc then_I_should_not_see { str } {
 
-  set spawn_id $pid
-  expect {
+  global asparagus_spawn_id
+
+  if { ! [ string length $asparagus_spawn_id ] } {
+    fail_step "not open"
+    return
+  }
+
+  set spawn_id "$asparagus_spawn_id"
+
+  if { [ catch { expect {
 
     "$str" {
-      fail_step "  $prefix I should not see `$str'"
+      fail_step "seen"
       return
     }
+    default { }
 
-    default {
-      pass_step "  $prefix I should not see `$str'"
-    }
-
+  } } msg ] } {
+    fail_step "$msg"
+    return
   }
 
-  dispatch_statement "$exe" $pid "then" {*}"$args"
+  pass_step
 
 }
+asparagus_register_step then_I_should_not_see "then I should not see"
 
-proc then_it_should_return { exe pid prefix code args } {
+### then it should return ?code?
+#
+# expect the program identified by `asparagus_spawn_id` to terminate and
+# return the given return code.
+#
+# If the program does not terminate within a set time, or returns a code that
+# is not the given one, the step fails, otherwise it passes.
+proc then_it_should_return { code } {
 
-  set spawn_id $pid
+  global asparagus_spawn_id
+
+  if { ! [ string length $asparagus_spawn_id ] } {
+    fail_step "not open"
+    return
+  }
+
+  set spawn_id "$asparagus_spawn_id"
 
   # consume input until eof, if any
-  if [catch { expect {
+  if [ catch { expect {
     eof { }
     timeout {
-      fail_step "  $prefix it should return $code"
+      fail_step "timed out"
       return
     }
   } } ] { }
 
   # wait for spawned process
-  lassign [wait $pid] wait_pid spawnid os_error_flag value
+  lassign [wait $asparagus_spawn_id] wait_pid spawnid os_error_flag value
 
-  if { $os_error_flag == 0 && $value == $code } {
-    pass_step "  $prefix it should return $code"
-  } else {
-    fail_step "  $prefix it should return $code"
+  if { $os_error_flag != 0 || $value != $code } {
+    fail_step "returned $os_error_flag : $value"
     return
   }
 
-  dispatch_statement "$exe" $pid "then" {*}"$args"
+  pass_step
 
 }
+asparagus_register_step then_it_should_return "then it should return"
 
-proc then_it_should_not_return { exe pid prefix code args } {
+### then it should not return ?code?
+#
+# expect the program identified by `asparagus_spawn_id` to terminate and
+# return the given return code.
+#
+# If the program does not terminate within a set time, or returns a code that
+# is equal to the given one, the step fails, otherwise it passes.
+proc then_it_should_not_return { code } {
 
-  set spawn_id $pid
+  global asparagus_spawn_id
+
+  if { ! [ string length $asparagus_spawn_id ] } {
+    fail_step "not open"
+    return
+  }
+
+  set spawn_id $asparagus_spawn_id
 
   # consume input until eof, if any
   if [catch { expect {
     eof { }
     timeout {
-      fail_step "  $prefix it should return $code"
+      fail_step "timed out"
       return
     }
   } } ] { }
 
   # wait for spawned process
-  lassign [wait $pid] wait_pid spawnid os_error_flag value
+  lassign [wait $asparagus_spawn_id] wait_pid spawnid os_error_flag value
 
-  if { $os_error_flag == 0 && $value != $code } {
-    pass_step "  $prefix it should not return $code"
-  } else {
-    fail_step "  $prefix it should not return $code"
+  if { $os_error_flag != 0 || $value == $code } {
+    fail_step "returned $os_error_flag : $value"
     return
   }
 
-  dispatch_statement "$exe" $pid "then" {*}"$args"
+  pass_step
 
 }
+asparagus_register_step then_it_should_not_return "then it should not return"
 
-proc then_write_the_output_to_log { exe pid prefix args } {
+### then write the output to log
+#
+# capture all output produced by the spawned process identified by
+# `asparagus_spawn_id` and send it to the log file and pass.
+proc then_write_the_output_to_log { } {
 
-  set spawn_id $pid
+  global asparagus_spawn_id
+
+  if { ! [ string length $asparagus_spawn_id ] } {
+    fail_step "not open"
+    return
+  }
+
+  set spawn_id $asparagus_spawn_id
 
   while 1 {
 
@@ -183,8 +298,7 @@ proc then_write_the_output_to_log { exe pid prefix args } {
 
   }
 
-  pass_step "  $prefix write the output to log"
-
-  dispatch_statement "$exe" $pid "then" {*}"$args"
+  pass_step
 
 }
+asparagus_register_step then_write_the_output_to_log "then write the output to log"

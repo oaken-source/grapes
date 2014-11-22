@@ -4,29 +4,29 @@
 ### test the file_map function
 set test_name "test the file_map function"
 # mapping a file should return the length and the contents
-given an executable "../tests/fdispatch" \
-  when I run with parameters "file_map ${srcdir}/static/file.txt" \
-  then I should see "length is: 20" \
-  and I should see "a content of a file" \
+given an executable "../tests/fdispatch"
+  when I run with parameters "file_map ${srcdir}/static/file.txt"
+  then I should see "length is: 20"
+  and I should see "a content of a file"
   and it should return 0
 # mapping an empty file should do the same
-given an executable "../tests/fdispatch" \
-  when I run with parameters "file_map ${srcdir}/static/empty.txt" \
-  then I should see "** length is: 0 **" \
+given an executable "../tests/fdispatch"
+  when I run with parameters "file_map ${srcdir}/static/empty.txt"
+  then I should see "** length is: 0 **"
   and it should return  0
 # mapping a nonexistant file should throw an error
-given an executable "../tests/fdispatch" \
-  when I run with parameters "file_map ${srcdir}/static/nonexistant.txt" \
-  then I should see "nonexistant.txt: No such file or directory" \
+given an executable "../tests/fdispatch"
+  when I run with parameters "file_map ${srcdir}/static/nonexistant.txt"
+  then I should see "nonexistant.txt: No such file or directory"
   and it should not return  0
 
 ### test the file_unmap function
 set test_name "test the file_unmap function"
 # check that all tests pass
-given an executable "../tests/fdispatch" \
-  when I run with parameters "file_unmap ${srcdir}" \
-  then I should see "steps passed: *4" \
-  and I should see "steps failed: *0" \
+given an executable "../tests/fdispatch"
+  when I run with parameters "file_unmap ${srcdir}"
+  then I should see "steps passed: *4"
+  and I should see "steps failed: *0"
   and it should return 0
 
 send_user "\n"

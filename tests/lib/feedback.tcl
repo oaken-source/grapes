@@ -23,11 +23,18 @@
 
 # print a passed step to the output stream, cucumber style, and call `pass'
 #   if in verbose mode, print the complete step message, else only '.'
-proc pass_step { str } {
+proc pass_step { } {
 
-  send_log "PASS: $str\n"
+  global asparagus_current_step_type
+  global asparagus_current_step
+
+  set str [ join "$asparagus_current_step" ]
+
+  set msg "$asparagus_current_step_type $str"
+
+  send_log "PASS: $msg\n"
   if { [ info exists ::env(VERBOSE) ] } {
-    puts "\033\[00;32m$str\033\[0m"
+    puts "\033\[00;32m$msg\033\[0m"
   } else {
     puts -nonewline "\033\[00;32m.\033\[0m"
     flush stdout
@@ -40,11 +47,20 @@ proc pass_step { str } {
 # print a failed step to the output stream, and call `fail'
 proc fail_step { str } {
 
-  global test_name
+  global asparagus_current_step_type
+  global asparagus_current_step
 
-  send_log "FAIL: $test_name : $str\n"
+  set str [ join "$asparagus_current_step" ]
+
+  set msg "$asparagus_current_step_type $str"
+
+  if { [ string length $str ] } {
+    set msg "$msg: $str"
+  }
+
+  send_log "FAIL: $msg\n"
   if { [ info exists ::env(VERBOSE) ] } {
-    puts "\033\[00;31m$str\033\[0m"
+    puts "\033\[00;31m$msg\033\[0m"
   } else {
     puts -nonewline "\033\[00;31mF\033\[0m"
     flush stdout
@@ -57,32 +73,19 @@ proc fail_step { str } {
 
 }
 
-# this is used when something is wrong - syntax errors and the likes.
-#   print the message to the output stream and exit the test
-proc fail_fatal { str } {
+# print an unrecognized step to the output stream and call `fail'
+proc fail_unknown { } {
 
-  global test_name
+  global asparagus_current_step_type
+  global asparagus_current_step
 
-  if { [ string length "$str" ] < 64 } {
-    send_user "\n\033\[00;31m!!!! FATAL : $test_name : $str\033\[0m\n"
-  } else {
-    send_user "\n\033\[00;31m!!!! FATAL : $test_name : [string range \"$str\" 0 60]...\033\[0m\n"
-  }
+  set str [ join "$asparagus_current_step" ]
 
-  incr_count FAIL
+  set msg "$asparagus_current_step_type $str"
 
-  global exit_status
-  set exit_status 1
-
-}
-
-proc fail_unknown { str } {
-
-  global test_name
-
-  send_log "MISS: $test_name : $str\n"
+  send_log "MISS: $msg\n"
   if { [ info exists ::env(VERBOSE) ] } {
-    puts "\033\[00;33m$str\033\[0m"
+    puts "\033\[00;33m$msg\033\[0m"
   } else {
     puts -nonewline "\033\[00;33mU\033\[0m"
     flush stdout

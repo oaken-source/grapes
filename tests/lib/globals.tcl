@@ -18,37 +18,26 @@
  #    along with this program.  If not, see <http://www.gnu.org/licenses/>.   #
  ##############################################################################
 
- # This is the asparagus testing framework backend TCL script.
+ # This file lists the global state information of asparagus, mainly for
+ # reference.
  ##############################################################################
 
-# include utility modules
-source [file dirname [info script]]/lib/feedback.tcl
-source [file dirname [info script]]/lib/string.tcl
-source [file dirname [info script]]/lib/globals.tcl
+## the path to the current executable
+# used by "Given an executable"
+global asparagus_executable_path
 
-# include the step dispatcher
-source [file dirname [info script]]/steps/dispatcher.tcl
+## the type of the last executed step
+# can be "Given" "When" or "Then"
+global asparagus_last_step_type
 
-# include the default step definitions
-source [file dirname [info script]]/steps/default.tcl
+## the actual type of the currently executing step
+# can be "Given" "  When" "  Then" or "  And"
+global asparagus_current_step_type
 
-# add your custom step definitions here, or add them to a dedicated file
-# and source this file here. Also take a look at steps/default.tcl for further
-# reference on step implementation.
+## the string form of the current step
+# used by the *_send procs
+global asparagus_current_step
 
-### example step definition:
-# proc when_something_happens { args } {
-#
-#   ## describe what your step does in TCL
-#   ## use `fail_step ?msg?` to describe failure states
-#
-#   ## end your step with a `pass_step`
-#   pass_step
-# }
-### register your step
-# asparagus_register_step when_something_happens "when something happens"
-#
-### now you can use you step in your tests
-# given an executable "test"
-#   when something happens
-#   then ...
+## the known step definitions and their string representations
+# use register_step to add your own
+global asparagus_step_definitions
