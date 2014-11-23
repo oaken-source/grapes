@@ -1,0 +1,122 @@
+
+set libdir $::env(libdir)
+set incdir $::env(incdir)
+
+set ::env(LD_LIBRARY_PATH) ${libdir}
+
+### test the feedback.h header
+# including the feedback header file should not produce warnings
+given the c code "
+    #include <grapes/feedback.h>
+    int main (void) { return 0; }"
+  when I compile with cflags "-I${incdir} -Wall -Wextra"
+  then I should not see "warning"
+  and it should return 0
+
+### test the feedback_assert function macro
+# if the condition is true, nothing should happen
+given the c code "
+    #include <grapes/feedback.h>
+    int main (void) {
+      feedback_assert(1, \"error_message\");
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Werror -lgrapes"
+  then it should return 0
+  when I run
+  then I should not see "error_message"
+  and it should return 0
+# otherwise the formatted message should be printed and the program terminates
+given the c code "
+    #include <grapes/feedback.h>
+    int main (void) {
+      feedback_assert(0, \"error_message: %u\", 1337);
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Werror -lgrapes"
+  then it should return 0
+  when I run
+  then I should see "a.out: error: error_message: 1337"
+  and it should not return 0
+
+### test the feedback_assert_wrn function macro
+# if the given condition is true, nothing should happen
+given the c code "
+    #include <grapes/feedback.h>
+    int main (void) {
+      feedback_assert_wrn(1, \"warning_message\");
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Werror -lgrapes"
+  then it should return 0
+  when I run
+  then I should not see "warning_message"
+  and it should return 0
+# otherwise the formatted mesage should be printed
+given the c code "
+    #include <grapes/feedback.h>
+    int main (void) {
+      feedback_assert_wrn(0, \"warning_message: %u\", 1337);
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Werror -lgrapes"
+  then it should return 0
+  when I run
+  then I should see "a.out: warning: warning_message: 1337"
+  and it should return 0
+
+### test the feedback_error_at_line function
+# it should print a formatted error message
+given the c code "
+    #include <grapes/feedback.h>
+    int main (void) {
+      feedback_error_at_line(__FILE__, __LINE__, \"error_message: %u\", 1337);
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Werror -lgrapes"
+  then it should return 0
+  when I run
+  then I should see "a.out:<stdin>:4: error: error_message: 1337"
+  and it should return 0
+
+### test the feedback_error function
+# it should print the error, and on EXIT_FAILURE should terminate
+given the c code "
+    #include <grapes/feedback.h>
+    int main (void) {
+      feedback_error(EXIT_FAILURE, \"error_message: %u\", 1337);
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Werror -lgrapes"
+  then it should return 0
+  when I run
+  then I should see "a.out: error: error_message: 1337"
+  and it should not return 0
+# on EXIT_SUCCESS, it should not terminate
+given the c code "
+    #include <grapes/feedback.h>
+    int main (void) {
+      feedback_error(EXIT_SUCCESS, \"error_message: %u\", 1337);
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Werror -lgrapes"
+  then it should return 0
+  when I run
+  then I should see "a.out: error: error_message: 1337"
+  and it should return 0
+
+### test the feedback_warning function
+# it should print the warning message
+given the c code "
+    #include <grapes/feedback.h>
+    int main (void) {
+      feedback_warning(\"warning_message: %u\", 1337);
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Werror -lgrapes"
+  then it should return 0
+  when I run
+  then I should see "a.out: warning: warning_message: 1337"
+  and it should return 0
+
+send_user "\n"

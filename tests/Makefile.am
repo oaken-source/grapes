@@ -1,12 +1,6 @@
 
 ## process this file with automake to produce Makefile.in
 
-check_PROGRAMS = fdispatch
-
-fdispatch_SOURCES = fdispatch.c
-fdispatch_LDADD = ${top_builddir}/src/libgrapes.la
-AM_CFLAGS += -I${top_srcdir}
-
 EXTRA_DIST =  asparagus.exp \
               lib/feedback.tcl lib/string.tcl \
               steps/dispatcher.tcl steps/default.tcl \
@@ -18,4 +12,16 @@ EXTRA_DIST =  asparagus.exp \
 
 AUTOMAKE_OPTIONS = dejagnu
 
-export DEJAGNU
+DEJAGNU  = $(top_srcdir)/tests/asparagus.exp
+DEJATOOL = grapes
+
+libdir   = $(top_builddir)/grapes/.libs/
+incdir   = $(top_srcdir)
+
+export DEJAGNU libdir incdir
+
+if PROFILING
+
+DEJATOOL += leakcheck
+
+endif ## PROFILING

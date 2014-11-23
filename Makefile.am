@@ -3,10 +3,4 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = src docs tests
-
-if PROFILING
-
-SUBDIRS += leakcheck
-
-endif ## PROFILING
+SUBDIRS = grapes docs tests

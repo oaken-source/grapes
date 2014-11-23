@@ -1,0 +1,17 @@
+
+set libdir $::env(libdir)
+set incdir $::env(incdir)
+
+set ::env(LD_LIBRARY_PATH) ${libdir}
+
+### test the file.h header
+# including the file header should not produce warnings
+given the c code "
+    #include <grapes/file.h>
+    int main (void) { return 0; }"
+  when I compile with cflags "-I${incdir} -Wall -Wextra"
+  then I should not see "warning"
+  and it should return 0
+
+### test the file_map function
+# 
