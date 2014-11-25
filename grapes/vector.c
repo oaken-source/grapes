@@ -21,16 +21,3 @@
 
 #include "vector.h"
 
-#include <string.h>
-
-int
-_vector_resize (struct _vector_generic *v, size_t item_size, size_t length)
-{
-  void *new = realloc(v->items, item_size * length);
-  assert_inner(new, "realloc");
-
-  v->items = new;
-  v->nitems = length;
-
-  return 0;
-}

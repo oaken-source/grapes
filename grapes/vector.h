@@ -43,9 +43,10 @@
     struct vector_ ## NAME \
     { \
       TYPE *items; \
+      void *_items; \
       size_t nitems; \
     }; \
-    typedef struct vector_ ## NAME NAME;
+    typedef struct vector_ ## NAME NAME
 
 /* initialize the fields of a vector instance (type agnostic)
  *
@@ -55,6 +56,7 @@
 #define vector_init(V) \
     { \
       (V)->items = NULL; \
+      (V)->_items = NULL; \
       (V)->nitems = 0; \
     }
 
@@ -70,6 +72,7 @@
     { \
       free((V)->items); \
       (V)->items = NULL; \
+      (V)->_items = NULL; \
       (V)->nitems = 0; \
     }
 
@@ -94,33 +97,12 @@
  */
 #define vector_push(V, ITEM) \
     ( \
-      _vector_resize((struct _vector_generic*)(V), sizeof(*((V)->items)), (V)->nitems + 1) \
-        ? 1 \
-        : (((V)->items[(V)->nitems - 1] = (ITEM)) \
-          , 0) \
+      ((V)->_items = realloc((V)->items, sizeof(*((V)->items)) * ((V)->nitems + 1))) \
+        ? ( \
+          ((V)->items = (V)->_items), \
+          ((V)->_items = NULL), \
+          ((V)->nitems = (V)->nitems + 1), \
+          ((V)->items[(V)->nitems - 1] = (ITEM)) \
+          , 0 \
+        ) : -1 \
     )
-
-/* this struct represents a typeless vector as a struct of the same size
- */
-struct _vector_generic
-{
-  void *items;
-  size_t nitems;
-};
-
-/* resize a generic vector to the given size, using the given item size
- * (internal function)
- *
- * params:
- *   v - a pointer to a vector of any type, cast to a generic vector pointer
- *   item_size - the size of an item in the original vector
- *   length - the number of items to resize to
- *
- * errors:
- *   may fail and set errno for the same reasons as realloc
- *
- * returns:
- *   -1 on failure, 0 on success
- */
-int _vector_resize(struct _vector_generic *v, size_t item_size, size_t length) may_fail;
-

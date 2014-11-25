@@ -18,9 +18,9 @@ given the c code "
 given the c code "
     #include <grapes/vector.h>
     #include <stdio.h>
-    vector_declare(vec, unsigned int)
+    vector_declare(vec, unsigned int);
     int main (void) {
-      struct vector_vec v = { NULL, 1337 };
+      struct vector_vec v = { NULL, NULL, 1337 };
       printf(\"%zu\\n\", v.nitems);
       return 0;
     }"
@@ -33,9 +33,9 @@ given the c code "
 given the c code "
     #include <grapes/vector.h>
     #include <stdio.h>
-    vector_declare(vec, unsigned int)
+    vector_declare(vec, unsigned int);
     int main (void) {
-      vec v = { NULL, 1337 };
+      vec v = { NULL, NULL, 1337 };
       printf(\"%zu\\n\", v.nitems);
       return 0;
     }"
@@ -51,9 +51,9 @@ given the c code "
     #include <grapes/vector.h>
     #include <stdio.h>
     #include <inttypes.h>
-    vector_declare(vec, unsigned int)
+    vector_declare(vec, unsigned int);
     int main (void) {
-      vec v = { NULL, 1337 };
+      vec v;
       vector_init(&v);
       printf(\"%\" PRIxPTR \", %zu\\n\", (uintptr_t)v.items, v.nitems);
       return 0;
@@ -70,9 +70,10 @@ given the c code "
     #include <grapes/vector.h>
     #include <stdio.h>
     #include <inttypes.h>
-    vector_declare(vec, unsigned int)
+    vector_declare(vec, unsigned int);
     int main (void) {
-      vec v = { NULL, 1337 };
+      vec v;
+      vector_init(&v);
       v.items = malloc(sizeof(*(v.items)) * 5);
       if (!v.items) return 1;
       v.nitems = 5;
@@ -90,9 +91,10 @@ given the c code "
     #include <grapes/vector.h>
     #include <stdio.h>
     #include <inttypes.h>
-    vector_declare(vec, unsigned int)
+    vector_declare(vec, unsigned int);
     int main (void) {
-      vec v = { NULL, 1337 };
+      vec v;
+      vector_init(&v);
       v.items = malloc(sizeof(*(v.items)) * 5);
       if (!v.items) return 1;
       v.nitems = 5;
@@ -115,7 +117,7 @@ given the c code "
 given the c code "
     #include <grapes/vector.h>
     #include <stdio.h>
-    vector_declare(vec, unsigned int)
+    vector_declare(vec, unsigned int);
     int main (void) {
       vec v;
       vector_init(&v);
@@ -135,7 +137,7 @@ given the c code "
 given the c code "
     #include <grapes/vector.h>
     #include <stdio.h>
-    vector_declare(vec, unsigned int)
+    vector_declare(vec, unsigned int);
     int main (void) {
       vec v;
       vector_init(&v);

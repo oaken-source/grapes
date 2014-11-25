@@ -27,6 +27,7 @@
 
 #include <errno.h>
 #include <stdlib.h>
+#include <stddef.h>
 
 /* sanitize common macro definitions */
 #ifndef DEBUG
@@ -68,6 +69,8 @@ void feedback_error_at_line(const char *filename, unsigned int linenum, const ch
 #  define assert_set_errno_ptr(COND, ERRNUM, ...) do { if(!(COND)) { errno = ERRNUM; return NULL; } } while (0)
 #  define assert_weak(COND, ...) do { if(!(COND)) { } } while (0)
 #endif
+
+#define static_assert(COND) typedef char _static_assertion[(!!(COND))*2-1]
 
 /* convenience min/max macros
  *
