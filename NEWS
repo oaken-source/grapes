@@ -5,7 +5,16 @@ See the end for copying conditions
 Please send grapes bug reports via
 <http://github.com/andy-graprof/grapes/issues/>.
 
-<< no releases >>
+Version 0.1
+
+* first release version
+
+* added unified feedback mechanisms
+* added simplified interface to mmap / munmap
+* added type-agnostic vector definitions
+* added static and dynamic assertion macros
+* added min / max macros
+* added semantic attribute keywords (__may_fail, __unused, __debug_func)
 
 
 ----------------------------------------------------------------------
