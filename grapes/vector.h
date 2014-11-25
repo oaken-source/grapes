@@ -29,6 +29,16 @@
 
 #include <stdlib.h>
 
+/* this macro create and typedef's a vector struct of the given name and type
+ * to be used with the generic vector_* functions below. This is similar to
+ * C++'s template classes.
+ * The created struct will have the name vector_ ## NAME and be typedef's to
+ * NAME.
+ *
+ * You are not supposed to alter the values inside the struct yourself, but
+ * as long as the values are valid array pointers and length, it should not
+ * break anything.
+ */
 #define vector_declare(NAME, TYPE) \
     struct vector_ ## NAME \
     { \
@@ -37,28 +47,80 @@
     }; \
     typedef struct vector_ ## NAME NAME;
 
-#define vector_map(V, FUNC) \
-    do { \
-      size_t i; \
-      for (i = 0; i < (V).nitems; ++i) \
-        FUNC((V).items[i]); \
-    } while (0)
+/* initialize the fields of a vector instance (type agnostic)
+ *
+ * params:
+ *   V - a pointer to a vector
+ */
+#define vector_init(V) \
+    { \
+      (V)->items = NULL; \
+      (V)->nitems = 0; \
+    }
 
-#define vector_init(V) _vector_init_impl((struct _vector_generic*)(V))
+/* clear the fields of a vector and free the associated resources
+ * (type agnostic). note that resources associated with the pushed items are
+ * not automatically freed. you need to iterate the vector to free the items
+ * before calling vector_clear to avoid memory leaks
+ *
+ * params:
+ *   V - a pointer to a vector
+ */
+#define vector_clear(V) \
+    { \
+      free((V)->items); \
+      (V)->items = NULL; \
+      (V)->nitems = 0; \
+    }
 
-#define vector_clear(V) _vector_clear_impl((struct _vector_generic*)(V))
+/* add a new item to the vector, resize the vector if necessary.
+ *
+ * this macro expands to an expression, instead of a statement to create a
+ * return value that can be used to determine wether the push succeeded,
+ * for example:
+ *
+ *   int res = vector_push(vector, item);
+ *   assert_inner(!res, "vector_push");
+ *
+ * params:
+ *   V -  a pointer to a vector
+ *   ITEM - an item of the type that matches the created vector
+ *
+ * errors:
+ *   may fail and set errno for the same reasons as errno
+ *
+ * returns:
+ *   -1 on failure, 0 on success
+ */
+#define vector_push(V, ITEM) \
+    ( \
+      _vector_resize((struct _vector_generic*)(V), sizeof(*((V)->items)), (V)->nitems + 1) \
+        ? 1 \
+        : (((V)->items[(V)->nitems - 1] = (ITEM)) \
+          , 0) \
+    )
 
-#define vector_push(V, ITEM) _vector_push_impl((struct _vector_generic*)V, &(ITEM), sizeof(ITEM))
-
+/* this struct represents a typeless vector as a struct of the same size
+ */
 struct _vector_generic
 {
   void *items;
   size_t nitems;
 };
 
-void _vector_init_impl(struct _vector_generic *v);
-
-void _vector_clear_impl (struct _vector_generic *v);
-
-int _vector_push_impl(struct _vector_generic *v, void *item, size_t size) may_fail;
+/* resize a generic vector to the given size, using the given item size
+ * (internal function)
+ *
+ * params:
+ *   v - a pointer to a vector of any type, cast to a generic vector pointer
+ *   item_size - the size of an item in the original vector
+ *   length - the number of items to resize to
+ *
+ * errors:
+ *   may fail and set errno for the same reasons as realloc
+ *
+ * returns:
+ *   -1 on failure, 0 on success
+ */
+int _vector_resize(struct _vector_generic *v, size_t item_size, size_t length) may_fail;
 

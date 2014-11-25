@@ -45,6 +45,7 @@
  *
  * errors:
  *   may fail and set errno for the same reasons as open, fstat and mmap
+ *   the behaviour is undefined if the length poiner is invalid
  *
  * returns:
  *   a pointer to the mapped area, if successful, NULL otherwise

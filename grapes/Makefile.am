@@ -11,6 +11,8 @@ libgrapes_la_include_HEADERS = feedback.h file.h vector.h util.h
 ## see http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html for an updating guide
 libgrapes_la_LDFLAGS = -version-info 0:0:0
 
+AM_CFLAGS += -I${top_srcdir}
+
 if PROFILING
 
 lib_LTLIBRARIES += libgrapes-gp.la

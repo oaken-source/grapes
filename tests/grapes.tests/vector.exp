@@ -1,0 +1,161 @@
+
+set libdir $::env(libdir)
+set incdir $::env(incdir)
+
+set ::env(LD_LIBRARY_PATH) ${libdir}
+
+### test the vector.h header
+# including the vector header should not produce warnings
+given the c code "
+    #include <grapes/vector.h>
+    int main (void) { return 0; }"
+  when I compile with cflags "-I${incdir} -Wall -Wextra"
+  then I should not see "warning"
+  and it should return 0
+
+### test the vector_declare function macro
+# declaring a vector should produce a container struct
+given the c code "
+    #include <grapes/vector.h>
+    #include <stdio.h>
+    vector_declare(vec, unsigned int)
+    int main (void) {
+      struct vector_vec v = { NULL, 1337 };
+      printf(\"%zu\\n\", v.nitems);
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -lgrapes"
+  then it should return 0
+  when I run
+  then I should see "1337"
+  and it should return 0
+# and it should be typedef'd
+given the c code "
+    #include <grapes/vector.h>
+    #include <stdio.h>
+    vector_declare(vec, unsigned int)
+    int main (void) {
+      vec v = { NULL, 1337 };
+      printf(\"%zu\\n\", v.nitems);
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -lgrapes"
+  then it should return 0
+  when I run
+  then I should see "1337"
+  and it should return 0
+
+### test the vector_init function macro
+# using the macro should set the vectors fields to known values
+given the c code "
+    #include <grapes/vector.h>
+    #include <stdio.h>
+    #include <inttypes.h>
+    vector_declare(vec, unsigned int)
+    int main (void) {
+      vec v = { NULL, 1337 };
+      vector_init(&v);
+      printf(\"%\" PRIxPTR \", %zu\\n\", (uintptr_t)v.items, v.nitems);
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -lgrapes"
+  then it should return 0
+  when I run
+  then I should see "0, 0"
+  and it should return 0
+
+### test the vector_clear function macro
+# using the macro should clear the vector of all items and free the resources
+given the c code "
+    #include <grapes/vector.h>
+    #include <stdio.h>
+    #include <inttypes.h>
+    vector_declare(vec, unsigned int)
+    int main (void) {
+      vec v = { NULL, 1337 };
+      v.items = malloc(sizeof(*(v.items)) * 5);
+      if (!v.items) return 1;
+      v.nitems = 5;
+      vector_clear(&v);
+      printf(\"%\" PRIxPTR \", %zu\\n\", (uintptr_t)v.items, v.nitems);
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -lgrapes"
+  then it should return 0
+  when I run
+  then I should see "0, 0"
+  and it should return 0
+# double clear should not be a problem
+given the c code "
+    #include <grapes/vector.h>
+    #include <stdio.h>
+    #include <inttypes.h>
+    vector_declare(vec, unsigned int)
+    int main (void) {
+      vec v = { NULL, 1337 };
+      v.items = malloc(sizeof(*(v.items)) * 5);
+      if (!v.items) return 1;
+      v.nitems = 5;
+      vector_clear(&v);
+      vector_clear(&v);
+      vector_clear(&v);
+      vector_clear(&v);
+      vector_clear(&v);
+      printf(\"%\" PRIxPTR \", %zu\\n\", (uintptr_t)v.items, v.nitems);
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -lgrapes"
+  then it should return 0
+  when I run
+  then I should see "0, 0"
+  and it should return 0
+
+### test the vector_push function macro
+# the macro should push a new item to the vector
+given the c code "
+    #include <grapes/vector.h>
+    #include <stdio.h>
+    vector_declare(vec, unsigned int)
+    int main (void) {
+      vec v;
+      vector_init(&v);
+      int res  = vector_push(&v, 1337);
+          res += vector_push(&v, 1338);
+      printf(\"%u, %u - %zu\\n\", v.items\[0\], v.items\[1\], v.nitems);
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -lgrapes"
+  then it should return 0
+  when I run
+  then I should see "1337, 1338 - 2"
+  and it should return 0
+
+### test a couple of push / clear cycles
+# push 10 items and clear, and do that five times
+given the c code "
+    #include <grapes/vector.h>
+    #include <stdio.h>
+    vector_declare(vec, unsigned int)
+    int main (void) {
+      vec v;
+      vector_init(&v);
+      unsigned int i;
+      for (i = 0; i < 5; ++i)
+        {
+          unsigned int j;
+          for (j = 0; j < 5; ++j)
+            {
+              int res  = vector_push(&v, 1337);
+                  res += vector_push(&v, 1338);
+            }
+          vector_clear(&v);
+        }
+      printf(\"%zu\\n\", v.nitems);
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -lgrapes"
+  then it should return 0
+  when I run
+  then I should see "0"
+  and it should return 0
+

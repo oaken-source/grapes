@@ -2,13 +2,13 @@
 ## process this file with automake to produce Makefile.in
 
 EXTRA_DIST =  asparagus.exp \
-              lib/feedback.tcl lib/string.tcl \
+              lib/feedback.tcl lib/globals.tcl lib/string.tcl \
               steps/dispatcher.tcl steps/default.tcl \
 	      static/file.txt static/empty.txt \
-	      grapes-feedback.tests/feedback.exp \
-	      grapes-file.tests/file.exp \
-	      grapes-util.tests/util.exp \
-	      grapes-vector.tests/vector.exp
+	      grapes.tests/feedback.exp \
+	      grapes.tests/file.exp \
+	      grapes.tests/util.exp \
+	      grapes.tests/vector.exp
 
 AUTOMAKE_OPTIONS = dejagnu
 

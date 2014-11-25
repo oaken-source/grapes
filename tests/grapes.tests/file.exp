@@ -14,4 +14,136 @@ given the c code "
   and it should return 0
 
 ### test the file_map function
-# 
+# mapping a file should return its contents and its length
+given the c code "
+    #include <grapes/file.h>
+    #include <stdio.h>
+    int main (void) {
+      size_t length;
+      char *data = file_map(\"${srcdir}/static/file.txt\", &length);
+      if (!data) return 1;
+      printf(\"length: %zu\\n content: '%s'\\n\", length, data);
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Werror -lgrapes"
+  then it should return 0
+  when I run
+  then I should see "length: 20"
+  and I should see "a content of a file"
+  and it should return 0
+# mapping an empty file should return an empty string and length 0
+given the c code "
+    #include <grapes/file.h>
+    #include <stdio.h>
+    int main (void) {
+      size_t length;
+      char *data = file_map(\"${srcdir}/static/empty.txt\", &length);
+      if (!data) return 1;
+      printf(\"length: %zu\\n content: '%s'\\n\", length, data);
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Werror -lgrapes"
+  then it should return 0
+  when I run
+  then I should see "length: 0"
+  and I should see "content: ''"
+  and it should return 0
+# mapping a nonexistant file should produce an error
+given the c code "
+    #include <grapes/file.h>
+    #include <stdio.h>
+    int main (void) {
+      size_t length;
+      char *data = file_map(\"${srcdir}/static/nonexistant.txt\", &length);
+      if (!data) return 1;
+      printf(\"length: %zu\\n content: '%s'\\n\", length, data);
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Werror -lgrapes"
+  then it should return 0
+  when I run
+  then I should not see "length:"
+  and it should not return 0
+# ignoring the return value should produce a warning
+given the c code "
+    #include <grapes/file.h>
+    int main (void) {
+      size_t length;
+      file_map(\"filename\", &length);
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -lgrapes"
+  then I should see "error: ignoring return value"
+  and it should not return 0
+
+### test the file_unmap function
+# unmapping a previously mapped file should succeed
+given the c code "
+    #include <grapes/file.h>
+    int main (void) {
+      size_t length;
+      char *data = file_map(\"${srcdir}/static/file.txt\", &length);
+      if (!data) return 1;
+      int res = file_unmap(data, length);
+      if (res) return 2;
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Werror -lgrapes"
+  then it should return 0
+  when I run
+  then it should return 0
+# unmapping a previously mapped empty file should succeed
+given the c code "
+    #include <grapes/file.h>
+    int main (void) {
+      size_t length;
+      char *data = file_map(\"${srcdir}/static/empty.txt\", &length);
+      if (!data) return 1;
+      int res = file_unmap(data, length);
+      if (res) return 2;
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Werror -lgrapes"
+  then it should return 0
+  when I run
+  then it should return 0
+# unmapping a failed map should succeed
+given the c code "
+    #include <grapes/file.h>
+    int main (void) {
+      size_t length;
+      char *data = file_map(\"${srcdir}/static/nonexistant.txt\", &length);
+      int res = file_unmap(data, length);
+      if (res) return 2;
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Werror -lgrapes"
+  then it should return 0
+  when I run
+  then it should return 0
+# unmapping a NULL pointer should succeed
+given the c code "
+    #include <grapes/file.h>
+    int main (void) {
+      int res = file_unmap(NULL, 1337);
+      if (res) return 2;
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Werror -lgrapes"
+  then it should return 0
+  when I run
+  then it should return 0
+# unmapping a random pointer should fail
+given the c code "
+    #include <grapes/file.h>
+    int main (void) {
+      int res = file_unmap((void*)0x1337, 1337);
+      if (res) return 2;
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Werror -lgrapes"
+  then it should return 0
+  when I run
+  then it should not return 0
+
+send_user "\n"

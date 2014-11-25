@@ -23,30 +23,14 @@
 
 #include <string.h>
 
-void
-_vector_init_impl (struct _vector_generic *v)
-{
-  v->items = NULL;
-  v->nitems = 0;
-}
-
-void
-_vector_clear_impl (struct _vector_generic *v)
-{
-  free(v->items);
-  v->items = NULL;
-  v->nitems = 0;
-}
-
 int
-_vector_push_impl(struct _vector_generic *v, void *item, size_t size)
+_vector_resize (struct _vector_generic *v, size_t item_size, size_t length)
 {
-  ++(v->nitems);
-  void *new = realloc(v->items, v->nitems * size);
+  void *new = realloc(v->items, item_size * length);
   assert_inner(new, "realloc");
 
   v->items = new;
-  memcpy(v->items + (v->nitems - 1) * size, item, size);
+  v->nitems = length;
 
   return 0;
 }
