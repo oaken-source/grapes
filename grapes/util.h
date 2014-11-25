@@ -45,7 +45,7 @@ void feedback_error_at_line(const char *filename, unsigned int linenum, const ch
  */
 #define static_assert(COND) typedef char _static_assertion[(!!(COND))*2-1]
 
-/* runtimr assertion
+/* runtime assertion
  * evaluate conditions at runtime and handle them differently
  *
  * these macros have different flavours and should be used in different
@@ -88,12 +88,12 @@ void feedback_error_at_line(const char *filename, unsigned int linenum, const ch
 
 /* convenience attribute shortcuts with semantic sugar */
 #ifdef __GNUC__
-#  define may_fail    __attribute__((warn_unused_result))
-#  define unused      __attribute__((unused))
-#  define debug_func  __attribute__((deprecated))
+#  define __may_fail    __attribute__((warn_unused_result))
+#  define __unused      __attribute__((unused))
+#  define __debug_func  __attribute__((deprecated))
 #else
-#  define may_fail
-#  define unused
-#  define debug_func
+#  define __may_fail
+#  define __unused
+#  define __debug_func
 #endif
 

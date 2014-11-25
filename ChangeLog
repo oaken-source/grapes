@@ -1,4 +1,19 @@
 
+2014-11-25  Andreas Grapentin  <andreas@grapentin.org>
+
+	* src/: renamed to grapes/
+	* tests/: added
+
+	* grapes/feedback.c: removed *_prefix stuff, removed progress meter,
+	removed feedback_readline, general simplification
+	* grapes/feedback.h: likewise
+	* grapes/file.c: improved map/unmap of empty file
+	* grapes/vector.c: added for type-agnostic vector implementation
+	* grapes/vector.h: likewise
+	* grapes/util.h: added static assertion macro, generalized runtime
+	assertion macros, added assert_weak macro, added function attribute
+	keywords
+
 2014-02-16  Andreas Grapentin  <andreas@grapentin.org>
 
 	* src/feedback.h: added functions to configure the print-prefix of
