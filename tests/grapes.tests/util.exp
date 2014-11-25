@@ -1,0 +1,400 @@
+
+set libdir $::env(libdir)
+set incdir $::env(incdir)
+
+set ::env(LD_LIBRARY_PATH) ${libdir}
+
+### test the util.h header
+# including the util header should not produce warnings
+given the c code "
+    #include <grapes/util.h>
+    int main (void) { return 0; }"
+  when I compile with cflags "-I${incdir} -Wall -Wextra"
+  then I should not see "warning"
+  and it should return 0
+
+### test the compiletime static_assert macro
+# compilation should fail if the condition is false
+given the c code "
+    #include <grapes/util.h>
+    static_assert(0);
+    int main (void) { return 0; }"
+  when I compile with cflags "-I${incdir} -Wall -Wextra"
+  then it should not return 0
+# it should succeed if the given condition is true
+given the c code "
+    #include <grapes/util.h>
+    static_assert(1);
+    int main (void) { return 0; }"
+  when I compile with cflags "-I${incdir} -Wall -Wextra"
+  then it should return 0
+
+### test the runtime assert_* macros
+# assert_inner should succeed and not print if the condition is true
+given the c code "
+    #include <grapes/util.h>
+    int main (void) {
+      assert_inner(1, \"error_message: %u\", 1337);
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -lgrapes"
+  then it should return 0
+  when I run
+  then I should not see "error_message"
+  and it should return 0
+# the same thing should happen if DEBUG is set
+given the c code "
+    #include <grapes/util.h>
+    int main (void) {
+      assert_inner(1, \"error_message: %u\", 1337);
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -DDEBUG -lgrapes"
+  then it should return 0
+  when I run
+  then I should not see "error_message"
+  and it should return 0
+# it should fail and not print the message if the condition is false
+given the c code "
+    #include <grapes/util.h>
+    int main (void) {
+      assert_inner(0, \"error_message: %u\", 1337);
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -lgrapes"
+  then it should return 0
+  when I run
+  then I should not see "error_message"
+  and it should not return 0
+# when DEBUG is set, the message should be seen
+given the c code "
+    #include <grapes/util.h>
+    int main (void) {
+      assert_inner(0, \"error_message: %u\", 1337);
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -DDEBUG -lgrapes"
+  then it should return 0
+  when I run
+  then I should see "a.out:<stdin>:4: error: error_message: 1337"
+  and it should not return 0
+# assert_inner_ptr should succeed and not print if the condition is true
+given the c code "
+    #include <grapes/util.h>
+    void *func(void) {
+      assert_inner_ptr(1, \"error_message: %u\", 1337);
+      return (void*)0x5;
+    }
+    int main (void) {
+      void *p = func();
+      if (!p) return 1;
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -lgrapes"
+  then it should return 0
+  when I run
+  then I should not see "error_message"
+  and it should return 0
+# the same thing should happen if DEBUG is set
+given the c code "
+    #include <grapes/util.h>
+    void *func(void) {
+      assert_inner_ptr(1, \"error_message: %u\", 1337);
+      return (void*)0x5;
+    }
+    int main (void) {
+      void *p = func();
+      if (!p) return 1;
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -DDEBUG -lgrapes"
+  then it should return 0
+  when I run
+  then I should not see "error_message"
+  and it should return 0
+# it should fail and not print the message if the condition is false
+given the c code "
+    #include <grapes/util.h>
+    void *func(void) {
+      assert_inner_ptr(0, \"error_message: %u\", 1337);
+      return (void*)0x5;
+    }
+    int main (void) {
+      void *p = func();
+      if (!p) return 1;
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -lgrapes"
+  then it should return 0
+  when I run
+  then I should not see "error_message"
+  and it should not return 0
+# when DEBUG is set, the message should be seen
+given the c code "
+    #include <grapes/util.h>
+    void *func(void) {
+      assert_inner_ptr(0, \"error_message: %u\", 1337);
+      return (void*)0x5;
+    }
+    int main (void) {
+      void *p = func();
+      if (!p) return 1;
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -DDEBUG -lgrapes"
+  then it should return 0
+  when I run
+  then I should see "a.out:<stdin>:4: error: error_message: 1337"
+  and it should not return 0
+# assert_set_errno should succeed and not print if the condition is true
+given the c code "
+    #include <grapes/util.h>
+    #include <stdio.h>
+    int func(void) {
+      assert_set_errno(1, ENOSYS, \"error_message: %u\", 1337);
+      return 0;
+    }
+    int main (void) {
+      int res = func();
+      perror(\"message\");
+      if (res) return 1;
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -lgrapes"
+  then it should return 0
+  when I run
+  then I should not see "error_message"
+  and it should return 0
+# the same thing should happen if DEBUG is set
+given the c code "
+    #include <grapes/util.h>
+    #include <stdio.h>
+    int func(void) {
+      assert_set_errno(1, ENOSYS, \"error_message: %u\", 1337);
+      return 0;
+    }
+    int main (void) {
+      int res = func();
+      perror(\"message\");
+      if (res) return 1;
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -DDEBUG -lgrapes"
+  then it should return 0
+  when I run
+  then I should not see "error_message"
+  and it should return 0
+  when I run
+  then I should see "message: Success"
+  and it should return 0
+# it should fail and not print the message if the condition is false
+given the c code "
+    #include <grapes/util.h>
+    #include <stdio.h>
+    int func(void) {
+      assert_set_errno(0, ENOSYS, \"error_message: %u\", 1337);
+      return 0;
+    }
+    int main (void) {
+      int res = func();
+      perror(\"message\");
+      if (res) return 1;
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -lgrapes"
+  then it should return 0
+  when I run
+  then I should not see "error_message"
+  and it should not return 0
+  when I run
+  then I should see "message: Function not implemented"
+  and it should not return 0
+# when DEBUG is set, the message should be seen
+given the c code "
+    #include <grapes/util.h>
+    #include <stdio.h>
+    int func(void) {
+      assert_set_errno(0, ENOSYS, \"error_message: %u\", 1337);
+      return 0;
+    }
+    int main (void) {
+      int res = func();
+      perror(\"message\");
+      if (res) return 1;
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -DDEBUG -lgrapes"
+  then it should return 0
+  when I run
+  then I should see "a.out:<stdin>:5: error: error_message: 1337"
+  and I should see "message: Function not implemented"
+  and it should not return 0
+# assert_set_errno_ptr should succeed and not print if the condition is true
+given the c code "
+    #include <grapes/util.h>
+    #include <stdio.h>
+    void *func(void) {
+      assert_set_errno_ptr(1, ENOSYS, \"error_message: %u\", 1337);
+      return (void*)0x5;
+    }
+    int main (void) {
+      void *p = func();
+      perror(\"message\");
+      if (!p) return 1;
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -lgrapes"
+  then it should return 0
+  when I run
+  then I should not see "error_message"
+  and it should return 0
+# the same thing should happen if DEBUG is set
+given the c code "
+    #include <grapes/util.h>
+    #include <stdio.h>
+    void *func(void) {
+      assert_set_errno_ptr(1, ENOSYS, \"error_message: %u\", 1337);
+      return (void*)0x5;
+    }
+    int main (void) {
+      void *p = func();
+      perror(\"message\");
+      if (!p) return 1;
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -DDEBUG -lgrapes"
+  then it should return 0
+  when I run
+  then I should not see "error_message"
+  and it should return 0
+  when I run
+  then I should see "message: Success"
+  and it should return 0
+# it should fail and not print the message if the condition is false
+given the c code "
+    #include <grapes/util.h>
+    #include <stdio.h>
+    void *func(void) {
+      assert_set_errno_ptr(0, ENOSYS, \"error_message: %u\", 1337);
+      return (void*)0x5;
+    }
+    int main (void) {
+      void *p = func();
+      perror(\"message\");
+      if (!p) return 1;
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -lgrapes"
+  then it should return 0
+  when I run
+  then I should not see "error_message"
+  and it should not return 0
+  when I run
+  then I should see "message: Function not implemented"
+  and it should not return 0
+# when DEBUG is set, the message should be seen
+given the c code "
+    #include <grapes/util.h>
+    #include <stdio.h>
+    void *func(void) {
+      assert_set_errno_ptr(0, ENOSYS, \"error_message: %u\", 1337);
+      return (void*)0x5;
+    }
+    int main (void) {
+      void *p = func();
+      perror(\"message\");
+      if (!p) return 1;
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -DDEBUG -lgrapes"
+  then it should return 0
+  when I run
+  then I should see "a.out:<stdin>:5: error: error_message: 1337"
+  and I should see "message: Function not implemented"
+  and it should not return 0
+# assert_weak should succeed and not print if the condition is true
+given the c code "
+    #include <grapes/util.h>
+    int main (void) {
+      assert_weak(1, \"error_message: %u\", 1337);
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -lgrapes"
+  then it should return 0
+  when I run
+  then I should not see "error_message"
+  and it should return 0
+# the same thing should happen if DEBUG is set
+given the c code "
+    #include <grapes/util.h>
+    int main (void) {
+      assert_weak(1, \"error_message: %u\", 1337);
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -DDEBUG -lgrapes"
+  then it should return 0
+  when I run
+  then I should not see "error_message"
+  and it should return 0
+# it should succeed and not print the message if the condition is false
+given the c code "
+    #include <grapes/util.h>
+    int main (void) {
+      assert_weak(0, \"error_message: %u\", 1337);
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -lgrapes"
+  then it should return 0
+  when I run
+  then I should not see "error_message"
+  and it should return 0
+# when DEBUG is set, the message should be seen
+given the c code "
+    #include <grapes/util.h>
+    int main (void) {
+      assert_weak(0, \"error_message: %u\", 1337);
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -DDEBUG -lgrapes"
+  then it should return 0
+  when I run
+  then I should see "a.out:<stdin>:4: error: error_message: 1337"
+  and it should return 0
+
+### test the min / max macros
+# test the min macro
+given the c code "
+    #include <grapes/util.h>
+    #include <stdio.h>
+    int main (void) {
+      int x = min(3, 9);
+      int y = min(6, 6);
+      int z = min(9, 3);
+      float a = min(3.5, 9.5);
+      printf(\"%u, %u, %u, %.2f\\n\", x, y, z, a);
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -lgrapes"
+  then it should return 0
+  when I run
+  then I should see "3, 6, 3, 3.50"
+  and it should return 0
+# test the max macro
+given the c code "
+    #include <grapes/util.h>
+    #include <stdio.h>
+    int main (void) {
+      int x = max(3, 9);
+      int y = max(6, 6);
+      int z = max(9, 3);
+      float a = max(3.5, 9.5);
+      printf(\"%u, %u, %u, %.2f\\n\", x, y, z, a);
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -lgrapes"
+  then it should return 0
+  when I run
+  then I should see "9, 6, 9, 9.50"
+  and it should return 0
+
+send_user "\n"

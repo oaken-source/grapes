@@ -37,7 +37,16 @@
 /* this function is used by the assertion macros below, to pretty print debug messages */
 void feedback_error_at_line(const char *filename, unsigned int linenum, const char *format, ...);
 
-/* assertion macros - define hell incoming!
+/* static assertion
+ * evaluate conditions at compile time and fail if not met
+ *
+ * params:
+ *   COND - the condition to check
+ */
+#define static_assert(COND) typedef char _static_assertion[(!!(COND))*2-1]
+
+/* runtimr assertion
+ * evaluate conditions at runtime and handle them differently
  *
  * these macros have different flavours and should be used in different
  * situations, where errors that occur are handed back to through the call
@@ -54,27 +63,25 @@ void feedback_error_at_line(const char *filename, unsigned int linenum, const ch
  * assert_set_errno_ptr:
  *   set errno to the given errnum and return NULL
  * assert_weak:
- *   only print the error string, but do not return
+ *   only print the error string, but not return
  */
-#if DEBUG
-#  define assert_inner(COND, ...) do { if(!(COND)) { feedback_error_at_line(__FILE__, __LINE__, __VA_ARGS__); return -1; } } while (0)
-#  define assert_inner_ptr(COND, ...) do { if(!(COND)) { feedback_error_at_line(__FILE__, __LINE__, __VA_ARGS__); return NULL; } } while (0)
-#  define assert_set_errno(COND, ERRNUM, ...) do { if(!(COND)) { errno = ERRNUM; feedback_error_at_line(__FILE__, __LINE__, __VA_ARGS__); return -1; } } while (0)
-#  define assert_set_errno_ptr(COND, ERRNUM, ...) do { if(!(COND)) { errno = ERRNUM; feedback_error_at_line(__FILE__, __LINE__, __VA_ARGS__); return NULL; } } while (0)
-#  define assert_weak(COND, ...) do { if (!(COND)) { feedback_error_at_line(__FILE__, __LINE__, __VA_ARGS__); } } while (0)
-#else
-#  define assert_inner(COND, ...) do { if(!(COND)) return -1; } while (0)
-#  define assert_inner_ptr(COND, ...) do { if(!(COND)) return NULL; } while (0)
-#  define assert_set_errno(COND, ERRNUM, ...) do { if(!(COND)) { errno = ERRNUM; return -1; } } while (0)
-#  define assert_set_errno_ptr(COND, ERRNUM, ...) do { if(!(COND)) { errno = ERRNUM; return NULL; } } while (0)
-#  define assert_weak(COND, ...) do { if(!(COND)) { } } while (0)
-#endif
+#define _assert_feedback(...) \
+  { if (DEBUG) { feedback_error_at_line(__FILE__, __LINE__, __VA_ARGS__); } }
 
-#define static_assert(COND) typedef char _static_assertion[(!!(COND))*2-1]
+#define assert_inner(COND, ...) \
+  { if (!(COND)) { _assert_feedback(__VA_ARGS__); return -1; } }
+#define assert_inner_ptr(COND, ...) \
+  { if (!(COND)) { _assert_feedback(__VA_ARGS__); return NULL; } }
+#define assert_set_errno(COND, ERRNUM, ...) \
+  { if (!(COND)) { errno = ERRNUM; _assert_feedback(__VA_ARGS__); return -1; } }
+#define assert_set_errno_ptr(COND, ERRNUM, ...) \
+  { if (!(COND)) { errno = ERRNUM; _assert_feedback(__VA_ARGS__); return NULL; } }
+#define assert_weak(COND, ...) \
+  { if (!(COND)) { _assert_feedback(__VA_ARGS__); } }
 
 /* convenience min/max macros
  *
- * note that these maxros may evaluate their parameters more than once.
+ * note that these macros evaluate their parameters more than once.
  */
 #define max(X, Y) ((X) > (Y) ? (X) : (Y))
 #define min(X, Y) ((X) > (Y) ? (Y) : (X))

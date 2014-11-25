@@ -71,9 +71,7 @@
 #define vector_clear(V) \
     { \
       free((V)->items); \
-      (V)->items = NULL; \
-      (V)->_items = NULL; \
-      (V)->nitems = 0; \
+      vector_init(V); \
     }
 
 /* add a new item to the vector, resize the vector if necessary.
@@ -90,7 +88,7 @@
  *   ITEM - an item of the type that matches the created vector
  *
  * errors:
- *   may fail and set errno for the same reasons as errno
+ *   may fail and set errno for the same reasons as realloc
  *
  * returns:
  *   -1 on failure, 0 on success
