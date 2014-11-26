@@ -54,4 +54,7 @@ given the c code "
   when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -lgrapes -finstrument-functions -g -lgraprof"
   then it should return 0
   when I run through profiler
-  then write the output to log
+  then I should see "Memory profile:"
+  and I should see "calls to free:"
+  and I should not see ":"
+  and it should return 0
