@@ -42,7 +42,8 @@
  *   COND - the condition to test
  *   ... - the parameters passed to feedback_error
  */
-#define feedback_assert(COND, ...) do { if(!(COND)) feedback_error(EXIT_FAILURE, __VA_ARGS__); } while (0)
+#define feedback_assert(COND, ...) \
+    do { if(!(COND)) feedback_error(EXIT_FAILURE, __VA_ARGS__); } while (0)
 
 /* convenience assertion macro - if the given condition is false, print a
  * formatted warning string to stderr using feedback_warning
@@ -51,7 +52,8 @@
  *   COND - the condition to test
  *   ... - the parameters passed to feedback_warning
  */
-#define feedback_assert_wrn(COND, ...) do { if(!(COND)) feedback_warning(__VA_ARGS__); } while (0)
+#define feedback_assert_wrn(COND, ...) \
+    do { if(!(COND)) feedback_warning(__VA_ARGS__); } while (0)
 
 /* prints a formatted error string to stderr similar to the one written by the
  * GNU extension fuction error_at_line, and is mainly used by the assertion

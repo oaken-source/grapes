@@ -305,7 +305,7 @@ proc then_it_should_return { code } {
       fail_step "timed out"
       return
     }
-  } } msg ] { }
+  } } ] { }
 
   # wait for spawned process
   lassign [wait $asparagus_spawn_id] wait_pid spawnid os_error_flag value

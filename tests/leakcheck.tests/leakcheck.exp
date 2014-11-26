@@ -1,0 +1,57 @@
+
+set libdir $::env(libdir)
+set incdir $::env(incdir)
+
+set ::env(LD_LIBRARY_PATH) ${libdir}
+
+### do a profiling run
+# using a representative subset of the library
+given the c code "
+    #include <grapes/feedback.h>
+    #include <grapes/file.h>
+    #include <grapes/vector.h>
+    #include <grapes/util.h>
+    #include <stdio.h>
+
+    vector_declare(vec, int);
+
+    int
+    main (void)
+    {
+      int e = 1337;
+      feedback_error(EXIT_SUCCESS, \"error_message: %u\", e++);
+      feedback_warning(\"warning_message: %u\", e++);
+      feedback_error_at_line(__FILE__, __LINE__, \"error_message: %u\", e++);
+
+      feedback_assert_wrn(1, \"warning_message: %u\", e++);
+      feedback_assert_wrn(0, \"warning_message: %u\", e++);
+
+      size_t l;
+      char *d = file_map(\"${srcdir}/static/file.txt\", &l);
+      printf(\"%s\", d);
+      __unused int res = file_unmap(d, l);
+      d = file_map(\"${srcdir}/static/empty.txt\", &l);
+      printf(\"%s\", d);
+      res = file_unmap(d, l);
+      d = file_map(\"${srcdir}/static/nonexistant.txt\", &l);
+      printf(\"%s\", d);
+      res = file_unmap(d, l);
+      res = file_unmap(NULL, 0);
+
+      vec v;
+      vector_init(&v);
+      vector_push(&v, 5);
+      vector_push(&v, 5);
+      vector_push(&v, 5);
+      vector_push(&v, 5.0);
+      vector_clear(&v);
+
+      feedback_assert(1, \"error_message: %u\", e++);
+      feedback_assert(0, \"error_message: %u\", e++);
+
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -lgrapes -finstrument-functions -g -lgraprof"
+  then it should return 0
+  when I run through profiler
+  then write the output to log

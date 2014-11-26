@@ -66,18 +66,18 @@ void feedback_error_at_line(const char *filename, unsigned int linenum, const ch
  *   only print the error string, but not return
  */
 #define _assert_feedback(...) \
-  do { if (DEBUG) { feedback_error_at_line(__FILE__, __LINE__, __VA_ARGS__); } } while (0)
+    do { if (DEBUG) { feedback_error_at_line(__FILE__, __LINE__, __VA_ARGS__); } } while (0)
 
 #define assert_inner(COND, ...) \
-  do { if (!(COND)) { _assert_feedback(__VA_ARGS__); return -1; } } while(0)
+    do { if (!(COND)) { _assert_feedback(__VA_ARGS__); return -1; } } while(0)
 #define assert_inner_ptr(COND, ...) \
-  do { if (!(COND)) { _assert_feedback(__VA_ARGS__); return NULL; } } while(0)
+    do { if (!(COND)) { _assert_feedback(__VA_ARGS__); return NULL; } } while(0)
 #define assert_set_errno(COND, ERRNUM, ...) \
-  do { if (!(COND)) { errno = ERRNUM; _assert_feedback(__VA_ARGS__); return -1; } } while(0)
+    do { if (!(COND)) { errno = ERRNUM; _assert_feedback(__VA_ARGS__); return -1; } } while(0)
 #define assert_set_errno_ptr(COND, ERRNUM, ...) \
-  do { if (!(COND)) { errno = ERRNUM; _assert_feedback(__VA_ARGS__); return NULL; } } while(0)
+    do { if (!(COND)) { errno = ERRNUM; _assert_feedback(__VA_ARGS__); return NULL; } } while(0)
 #define assert_weak(COND, ...) \
-  do { if (!(COND)) { _assert_feedback(__VA_ARGS__); } } while (0)
+    do { if (!(COND)) { _assert_feedback(__VA_ARGS__); } } while (0)
 
 /* convenience min/max macros
  *

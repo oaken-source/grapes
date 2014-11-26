@@ -25,6 +25,7 @@ m4/l*
 *.log
 *.sum
 site.*
+graprof.out
 
 # locally used scripts
 integrate.sh
