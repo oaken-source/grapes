@@ -54,11 +54,11 @@
  *   V - a pointer to a vector
  */
 #define vector_init(V) \
-    { \
+    do { \
       (V)->items = NULL; \
       (V)->_items = NULL; \
       (V)->nitems = 0; \
-    }
+    } while (0)
 
 /* clear the fields of a vector and free the associated resources
  * (type agnostic). note that resources associated with the pushed items are
@@ -69,10 +69,10 @@
  *   V - a pointer to a vector
  */
 #define vector_clear(V) \
-    { \
+    do { \
       free((V)->items); \
       vector_init(V); \
-    }
+    } while(0)
 
 /* add a new item to the vector, resize the vector if necessary.
  *
