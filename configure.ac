@@ -2,7 +2,7 @@
 dnl process this file with autoconf to procude configure script
 
 AC_PREREQ([2.69])
-AC_INIT([grapes], [0.1], [andreas@grapentin.org])
+AC_INIT([grapes], [0.1.1], [andreas@grapentin.org])
 AC_CONFIG_SRCDIR([grapes/util.h])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_AUX_DIR([scripts])
