@@ -51,7 +51,7 @@ given the c code "
 
       return 0;
     }"
-  when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -lgrapes -finstrument-functions -g -lgraprof"
+  when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -lgrapes-gp -finstrument-functions -g -lgraprof"
   then it should return 0
   when I run through profiler
   then I should see "Memory profile:"

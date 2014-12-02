@@ -361,6 +361,132 @@ given the c code "
   then I should see "a.out:<stdin>:4: error: error_message: 1337"
   and it should return 0
 
+### test the __checked_call macros
+# __checked_call should behave like assert_inner with implicit message string
+given the c code "
+    #include <grapes/util.h>
+    int func (void) { return 0; }
+    int main (void) {
+      __checked_call(0 == func());
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -lgrapes"
+  then it should return 0
+  when I run
+  then I should not see "func"
+  and it should return 0
+# the same thing should happen if DEBUG is set
+given the c code "
+    #include <grapes/util.h>
+    int func (void) { return 0; }
+    int main (void) {
+      __checked_call(0 == func());
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -DDEBUG -lgrapes"
+  then it should return 0
+  when I run
+  then I should not see "func"
+  and it should return 0
+# it should fail and not print the message if the condition is false
+given the c code "
+    #include <grapes/util.h>
+    int func (void) { return 1; }
+    int main (void) {
+      __checked_call(0 == func());
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -lgrapes"
+  then it should return 0
+  when I run
+  then I should not see "func"
+  and it should not return 0
+# when DEBUG is set, the message should be seen
+given the c code "
+    #include <grapes/util.h>
+    int func (void) { return 1; }
+    int main (void) {
+      __checked_call(0 == func());
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -DDEBUG -lgrapes"
+  then it should return 0
+  when I run
+  then I should see "a.out:<stdin>:5: error: 0 == func()"
+  and it should not return 0
+# __checked_call_ptr should behave like assert_inner_ptr
+given the c code "
+    #include <grapes/util.h>
+    int func (void) { return 0; }
+    void *func1(void) {
+      __checked_call_ptr(0 == func());
+      return (void*)0x5;
+    }
+    int main (void) {
+      void *p = func1();
+      if (!p) return 1;
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -lgrapes"
+  then it should return 0
+  when I run
+  then I should not see "func"
+  and it should return 0
+# the same thing should happen if DEBUG is set
+given the c code "
+    #include <grapes/util.h>
+    int func (void) { return 0; }
+    void *func1(void) {
+      __checked_call_ptr(0 == func());
+      return (void*)0x5;
+    }
+    int main (void) {
+      void *p = func1();
+      if (!p) return 1;
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -DDEBUG -lgrapes"
+  then it should return 0
+  when I run
+  then I should not see "func"
+  and it should return 0
+# it should fail and not print the message if the condition is false
+given the c code "
+    #include <grapes/util.h>
+    int func (void) { return 1; }
+    void *func1(void) {
+      __checked_call_ptr(0 == func());
+      return (void*)0x5;
+    }
+    int main (void) {
+      void *p = func1();
+      if (!p) return 1;
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -lgrapes"
+  then it should return 0
+  when I run
+  then I should not see "func"
+  and it should not return 0
+# when DEBUG is set, the message should be seen
+given the c code "
+    #include <grapes/util.h>
+    int func (void) { return 1; }
+    void *func1(void) {
+      __checked_call_ptr(0 == func());
+      return (void*)0x5;
+    }
+    int main (void) {
+      void *p = func1();
+      if (!p) return 1;
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -DDEBUG -lgrapes"
+  then it should return 0
+  when I run
+  then I should see "a.out:<stdin>:5: error: 0 == func()"
+  and it should not return 0
+
 ### test the min / max macros
 # test the min macro
 given the c code "
