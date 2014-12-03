@@ -41,9 +41,9 @@ void feedback_error_at_line(const char *filename, unsigned int linenum, const ch
  * evaluate conditions at compile time and fail if not met
  *
  * params:
- *   COND - the condition to check
+ *   C - the condition to check
  */
-#define static_assert(COND) typedef char _static_assertion[(!!(COND))*2-1]
+#define static_assert(C) typedef char _static_assertion[(!!(C))*2-1]
 
 /* runtime assertion
  * evaluate conditions at runtime and handle them differently
@@ -64,27 +64,33 @@ void feedback_error_at_line(const char *filename, unsigned int linenum, const ch
  *   set errno to the given errnum and return NULL
  * assert_weak:
  *   only print the error string, but not return
+ * __checked_call:
+ *   assertion macro with different semantic - the message is implicit
+ * __checked_call_ptr:
+ *   likewise
  */
-#define _assert_feedback(...) \
-    do { if (DEBUG) { feedback_error_at_line(__FILE__, __LINE__, __VA_ARGS__); } } while (0)
+#define _assert_generic(C, E, B, R, F, ...) \
+    do { \
+      if (__likely(C))  break; \
+      if (E)            errno = (E); \
+      if (DEBUG)        feedback_error_at_line(__FILE__, __LINE__, __VA_ARGS__); \
+      F \
+      if (B)            return (R); \
+    } while (0)
+#define assert_inner(C, ...)            _assert_generic((C),   0, 1,   -1,  , __VA_ARGS__)
+#define assert_inner_ptr(C, ...)        _assert_generic((C),   0, 1, NULL,  , __VA_ARGS__)
+#define assert_set_errno(C, E, ...)     _assert_generic((C), (E), 1,   -1,  , __VA_ARGS__)
+#define assert_set_errno_ptr(C, E, ...) _assert_generic((C), (E), 1, NULL,  , __VA_ARGS__)
+#define assert_weak(C, ...)             _assert_generic((C),   0, 0,    0,  , __VA_ARGS__)
 
-#define assert_inner(COND, ...) \
-    do { if (__unlikely(!(COND))) { _assert_feedback(__VA_ARGS__); return -1; } } while(0)
-#define assert_inner_ptr(COND, ...) \
-    do { if (__unlikely(!(COND))) { _assert_feedback(__VA_ARGS__); return NULL; } } while(0)
-#define assert_set_errno(COND, ERRNUM, ...) \
-    do { if (__unlikely(!(COND))) { errno = ERRNUM; _assert_feedback(__VA_ARGS__); return -1; } } while(0)
-#define assert_set_errno_ptr(COND, ERRNUM, ...) \
-    do { if (__unlikely(!(COND))) { errno = ERRNUM; _assert_feedback(__VA_ARGS__); return NULL; } } while(0)
-#define assert_weak(COND, ...) \
-    do { if (__unlikely(!(COND))) { _assert_feedback(__VA_ARGS__); } } while (0)
+#define __checked_call_1(R, C)          _assert_generic((C),   0, 1,  (R),  , # C)
+#define __checked_call_2(R, C, F)       _assert_generic((C),   0, 1,  (R), F, # C)
 
-/* runtime assertion using the macros above
- */
-#define __checked_call(C) \
-    do { assert_inner((C), # C); } while (0)
-#define __checked_call_ptr(C) \
-    do { assert_inner_ptr((C), # C); } while (0)
+#define __get_third(arg1, arg2, arg3, ...) arg3
+#define __checked_call_disp(...) __get_third(__VA_ARGS__, __checked_call_2, __checked_call_1)
+
+#define __checked_call(...)     __checked_call_disp(__VA_ARGS__)(  -1, __VA_ARGS__)
+#define __checked_call_ptr(...) __checked_call_disp(__VA_ARGS__)(NULL, __VA_ARGS__)
 
 /* convenience min/max macros
  *
