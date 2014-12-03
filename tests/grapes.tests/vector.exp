@@ -161,3 +161,36 @@ given the c code "
   then I should see "0"
   and it should return 0
 
+### test the vector_map function macro
+# check that vector_map executes the given code for all items
+given the c code "
+    #include <grapes/vector.h>
+    #include <stdio.h>
+    vector_declare(vec, unsigned int);
+    int main (void) {
+      vec v;
+      vector_init(&v);
+      unsigned int i;
+      for (i = 0; i < 10; ++i)
+        __checked_call(0 == vector_push(&v, 1337 + i));
+      vector_map(&v, ITEM,
+        printf(\"test: %u\\n\", ITEM);
+      );
+      return 0;
+    }"
+  when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -lgrapes"
+  then it should return 0
+  when I run
+  then I should see "test: 1337"
+  and I should see "test: 1338"
+  and I should see "test: 1339"
+  and I should see "test: 1340"
+  and I should see "test: 1341"
+  and I should see "test: 1342"
+  and I should see "test: 1343"
+  and I should see "test: 1344"
+  and I should see "test: 1345"
+  and I should see "test: 1346"
+  and it should return 0
+
+send_user "\n"

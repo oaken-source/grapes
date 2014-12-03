@@ -3,12 +3,13 @@
 
 EXTRA_DIST =  asparagus.exp \
               lib/feedback.tcl lib/globals.tcl lib/string.tcl \
-              steps/dispatcher.tcl steps/default.tcl \
+              steps/dispatcher.tcl steps/custom.tcl steps/default.tcl \
               static/file.txt static/empty.txt \
               grapes.tests/feedback.exp \
               grapes.tests/file.exp \
               grapes.tests/util.exp \
-              grapes.tests/vector.exp
+              grapes.tests/vector.exp \
+              leakcheck.tests/leakcheck.exp
 
 AUTOMAKE_OPTIONS = dejagnu
 
