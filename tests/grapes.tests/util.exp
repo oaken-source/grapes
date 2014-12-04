@@ -29,60 +29,70 @@ given the c code "
   when I compile with cflags "-I${incdir} -Wall -Wextra"
   then it should return 0
 
-### test the runtime assert_* macros
-# assert_inner should succeed and not print if the condition is true
+### test the __precondition macro
+# __precondition should succeed and not print if the condition is true
 given the c code "
     #include <grapes/util.h>
     int main (void) {
-      assert_inner(1, \"error_message: %u\", 1337);
+      __returns_int;
+      int some_variable = 1;
+      __precondition(1 == some_variable);
       return 0;
     }"
   when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -lgrapes"
   then it should return 0
   when I run
-  then I should not see "error_message"
+  then I should not see "some_variable"
   and it should return 0
 # the same thing should happen if DEBUG is set
 given the c code "
     #include <grapes/util.h>
     int main (void) {
-      assert_inner(1, \"error_message: %u\", 1337);
+      __returns_int;
+      int some_variable = 1;
+      __precondition(1 == some_variable);
       return 0;
     }"
   when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -DDEBUG -lgrapes"
   then it should return 0
   when I run
-  then I should not see "error_message"
+  then I should not see "some_variable"
   and it should return 0
 # it should fail and not print the message if the condition is false
 given the c code "
     #include <grapes/util.h>
     int main (void) {
-      assert_inner(0, \"error_message: %u\", 1337);
+      __returns_int;
+      int some_variable = 0;
+      __precondition(1 == some_variable);
       return 0;
     }"
   when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -lgrapes"
   then it should return 0
   when I run
-  then I should not see "error_message"
+  then I should not see "some_variable"
   and it should not return 0
 # when DEBUG is set, the message should be seen
 given the c code "
     #include <grapes/util.h>
     int main (void) {
-      assert_inner(0, \"error_message: %u\", 1337);
+      __returns_int;
+      int some_variable = 0;
+      __precondition(1 == some_variable);
       return 0;
     }"
   when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -DDEBUG -lgrapes"
   then it should return 0
   when I run
-  then I should see "a.out:<stdin>:4: error: error_message: 1337"
+  then I should see "a.out:<stdin>:6: error: precondition failed: 1 == some_variable"
   and it should not return 0
-# assert_inner_ptr should succeed and not print if the condition is true
+# __precondition should behave the same in a function returning a pointer type
 given the c code "
     #include <grapes/util.h>
     void *func(void) {
-      assert_inner_ptr(1, \"error_message: %u\", 1337);
+      __returns_ptr;
+      int some_variable = 1;
+      __precondition(1 == some_variable);
       return (void*)0x5;
     }
     int main (void) {
@@ -93,13 +103,15 @@ given the c code "
   when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -lgrapes"
   then it should return 0
   when I run
-  then I should not see "error_message"
+  then I should not see "some_variable"
   and it should return 0
 # the same thing should happen if DEBUG is set
 given the c code "
     #include <grapes/util.h>
     void *func(void) {
-      assert_inner_ptr(1, \"error_message: %u\", 1337);
+      __returns_ptr;
+      int some_variable = 1;
+      __precondition(1 == some_variable);
       return (void*)0x5;
     }
     int main (void) {
@@ -110,13 +122,15 @@ given the c code "
   when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -DDEBUG -lgrapes"
   then it should return 0
   when I run
-  then I should not see "error_message"
+  then I should not see "some_variable"
   and it should return 0
 # it should fail and not print the message if the condition is false
 given the c code "
     #include <grapes/util.h>
     void *func(void) {
-      assert_inner_ptr(0, \"error_message: %u\", 1337);
+      __returns_ptr;
+      int some_variable = 0;
+      __precondition(1 == some_variable);
       return (void*)0x5;
     }
     int main (void) {
@@ -127,13 +141,15 @@ given the c code "
   when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -lgrapes"
   then it should return 0
   when I run
-  then I should not see "error_message"
+  then I should not see "some_variable"
   and it should not return 0
 # when DEBUG is set, the message should be seen
 given the c code "
     #include <grapes/util.h>
     void *func(void) {
-      assert_inner_ptr(0, \"error_message: %u\", 1337);
+      __returns_ptr;
+      int some_variable = 0;
+      __precondition(1 == some_variable);
       return (void*)0x5;
     }
     int main (void) {
@@ -144,14 +160,16 @@ given the c code "
   when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -DDEBUG -lgrapes"
   then it should return 0
   when I run
-  then I should see "a.out:<stdin>:4: error: error_message: 1337"
+  then I should see "a.out:<stdin>:6: error: precondition failed: 1 == some_variable"
   and it should not return 0
-# assert_set_errno should succeed and not print if the condition is true
+# __precondition should allow to set errno
 given the c code "
     #include <grapes/util.h>
     #include <stdio.h>
     int func(void) {
-      assert_set_errno(1, ENOSYS, \"error_message: %u\", 1337);
+      __returns_int;
+      int some_variable = 1;
+      __precondition(ENOSYS, 1 == some_variable);
       return 0;
     }
     int main (void) {
@@ -163,14 +181,19 @@ given the c code "
   when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -lgrapes"
   then it should return 0
   when I run
-  then I should not see "error_message"
+  then I should not see "some_variable"
+  and it should return 0
+  when I run
+  then I should see "message: Success"
   and it should return 0
 # the same thing should happen if DEBUG is set
 given the c code "
     #include <grapes/util.h>
     #include <stdio.h>
     int func(void) {
-      assert_set_errno(1, ENOSYS, \"error_message: %u\", 1337);
+      __returns_int;
+      int some_variable = 1;
+      __precondition(ENOSYS, 1 == some_variable);
       return 0;
     }
     int main (void) {
@@ -182,7 +205,7 @@ given the c code "
   when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -DDEBUG -lgrapes"
   then it should return 0
   when I run
-  then I should not see "error_message"
+  then I should not see "some_variable"
   and it should return 0
   when I run
   then I should see "message: Success"
@@ -192,7 +215,9 @@ given the c code "
     #include <grapes/util.h>
     #include <stdio.h>
     int func(void) {
-      assert_set_errno(0, ENOSYS, \"error_message: %u\", 1337);
+      __returns_int;
+      int some_variable = 0;
+      __precondition(ENOSYS, 1 == some_variable);
       return 0;
     }
     int main (void) {
@@ -204,7 +229,7 @@ given the c code "
   when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -lgrapes"
   then it should return 0
   when I run
-  then I should not see "error_message"
+  then I should not see "some_variable"
   and it should not return 0
   when I run
   then I should see "message: Function not implemented"
@@ -214,7 +239,9 @@ given the c code "
     #include <grapes/util.h>
     #include <stdio.h>
     int func(void) {
-      assert_set_errno(0, ENOSYS, \"error_message: %u\", 1337);
+      __returns_int;
+      int some_variable = 0;
+      __precondition(ENOSYS, 1 == some_variable);
       return 0;
     }
     int main (void) {
@@ -226,15 +253,17 @@ given the c code "
   when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -DDEBUG -lgrapes"
   then it should return 0
   when I run
-  then I should see "a.out:<stdin>:5: error: error_message: 1337"
+  then I should see "a.out:<stdin>:7: error: precondition failed: 1 == some_variable"
   and I should see "message: Function not implemented"
   and it should not return 0
-# assert_set_errno_ptr should succeed and not print if the condition is true
+# the same shold happen in a function returning a pointer type
 given the c code "
     #include <grapes/util.h>
     #include <stdio.h>
     void *func(void) {
-      assert_set_errno_ptr(1, ENOSYS, \"error_message: %u\", 1337);
+      __returns_ptr;
+      int some_variable = 1;
+      __precondition(ENOSYS, 1 == some_variable);
       return (void*)0x5;
     }
     int main (void) {
@@ -246,14 +275,19 @@ given the c code "
   when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -lgrapes"
   then it should return 0
   when I run
-  then I should not see "error_message"
+  then I should not see "some_variable"
+  and it should return 0
+  when I run
+  then I should see "message: Success"
   and it should return 0
 # the same thing should happen if DEBUG is set
 given the c code "
     #include <grapes/util.h>
     #include <stdio.h>
     void *func(void) {
-      assert_set_errno_ptr(1, ENOSYS, \"error_message: %u\", 1337);
+      __returns_ptr;
+      int some_variable = 1;
+      __precondition(ENOSYS, 1 == some_variable);
       return (void*)0x5;
     }
     int main (void) {
@@ -265,7 +299,7 @@ given the c code "
   when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -DDEBUG -lgrapes"
   then it should return 0
   when I run
-  then I should not see "error_message"
+  then I should not see "some_variable"
   and it should return 0
   when I run
   then I should see "message: Success"
@@ -275,7 +309,9 @@ given the c code "
     #include <grapes/util.h>
     #include <stdio.h>
     void *func(void) {
-      assert_set_errno_ptr(0, ENOSYS, \"error_message: %u\", 1337);
+      __returns_ptr;
+      int some_variable = 0;
+      __precondition(ENOSYS, 1 == some_variable);
       return (void*)0x5;
     }
     int main (void) {
@@ -287,7 +323,7 @@ given the c code "
   when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -lgrapes"
   then it should return 0
   when I run
-  then I should not see "error_message"
+  then I should not see "some_variable"
   and it should not return 0
   when I run
   then I should see "message: Function not implemented"
@@ -297,7 +333,9 @@ given the c code "
     #include <grapes/util.h>
     #include <stdio.h>
     void *func(void) {
-      assert_set_errno_ptr(0, ENOSYS, \"error_message: %u\", 1337);
+      __returns_ptr;
+      int some_variable = 0;
+      __precondition(ENOSYS, 1 == some_variable);
       return (void*)0x5;
     }
     int main (void) {
@@ -309,57 +347,9 @@ given the c code "
   when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -DDEBUG -lgrapes"
   then it should return 0
   when I run
-  then I should see "a.out:<stdin>:5: error: error_message: 1337"
+  then I should see "a.out:<stdin>:7: error: precondition failed: 1 == some_variable"
   and I should see "message: Function not implemented"
   and it should not return 0
-# assert_weak should succeed and not print if the condition is true
-given the c code "
-    #include <grapes/util.h>
-    int main (void) {
-      assert_weak(1, \"error_message: %u\", 1337);
-      return 0;
-    }"
-  when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -lgrapes"
-  then it should return 0
-  when I run
-  then I should not see "error_message"
-  and it should return 0
-# the same thing should happen if DEBUG is set
-given the c code "
-    #include <grapes/util.h>
-    int main (void) {
-      assert_weak(1, \"error_message: %u\", 1337);
-      return 0;
-    }"
-  when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -DDEBUG -lgrapes"
-  then it should return 0
-  when I run
-  then I should not see "error_message"
-  and it should return 0
-# it should succeed and not print the message if the condition is false
-given the c code "
-    #include <grapes/util.h>
-    int main (void) {
-      assert_weak(0, \"error_message: %u\", 1337);
-      return 0;
-    }"
-  when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -lgrapes"
-  then it should return 0
-  when I run
-  then I should not see "error_message"
-  and it should return 0
-# when DEBUG is set, the message should be seen
-given the c code "
-    #include <grapes/util.h>
-    int main (void) {
-      assert_weak(0, \"error_message: %u\", 1337);
-      return 0;
-    }"
-  when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -DDEBUG -lgrapes"
-  then it should return 0
-  when I run
-  then I should see "a.out:<stdin>:4: error: error_message: 1337"
-  and it should return 0
 
 ### test the __checked_call macros
 # __checked_call should behave like assert_inner with implicit message string
@@ -367,6 +357,7 @@ given the c code "
     #include <grapes/util.h>
     int func (void) { return 0; }
     int main (void) {
+      __returns_int;
       __checked_call(0 == func());
       return 0;
     }"
@@ -380,6 +371,7 @@ given the c code "
     #include <grapes/util.h>
     int func (void) { return 0; }
     int main (void) {
+      __returns_int;
       __checked_call(0 == func());
       return 0;
     }"
@@ -393,6 +385,7 @@ given the c code "
     #include <grapes/util.h>
     int func (void) { return 1; }
     int main (void) {
+      __returns_int;
       __checked_call(0 == func());
       return 0;
     }"
@@ -406,20 +399,22 @@ given the c code "
     #include <grapes/util.h>
     int func (void) { return 1; }
     int main (void) {
+      __returns_int;
       __checked_call(0 == func());
       return 0;
     }"
   when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -DDEBUG -lgrapes"
   then it should return 0
   when I run
-  then I should see "a.out:<stdin>:5: error: 0 == func()"
+  then I should see "a.out:<stdin>:6: error: checked call failed: 0 == func()"
   and it should not return 0
 # __checked_call_ptr should behave like assert_inner_ptr
 given the c code "
     #include <grapes/util.h>
     int func (void) { return 0; }
     void *func1(void) {
-      __checked_call_ptr(0 == func());
+      __returns_ptr;
+      __checked_call(0 == func());
       return (void*)0x5;
     }
     int main (void) {
@@ -437,7 +432,8 @@ given the c code "
     #include <grapes/util.h>
     int func (void) { return 0; }
     void *func1(void) {
-      __checked_call_ptr(0 == func());
+      __returns_ptr;
+      __checked_call(0 == func());
       return (void*)0x5;
     }
     int main (void) {
@@ -455,7 +451,8 @@ given the c code "
     #include <grapes/util.h>
     int func (void) { return 1; }
     void *func1(void) {
-      __checked_call_ptr(0 == func());
+      __returns_ptr;
+      __checked_call(0 == func());
       return (void*)0x5;
     }
     int main (void) {
@@ -473,7 +470,8 @@ given the c code "
     #include <grapes/util.h>
     int func (void) { return 1; }
     void *func1(void) {
-      __checked_call_ptr(0 == func());
+      __returns_ptr;
+      __checked_call(0 == func());
       return (void*)0x5;
     }
     int main (void) {
@@ -484,7 +482,7 @@ given the c code "
   when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -DDEBUG -lgrapes"
   then it should return 0
   when I run
-  then I should see "a.out:<stdin>:5: error: 0 == func()"
+  then I should see "a.out:<stdin>:6: error: checked call failed: 0 == func()"
   and it should not return 0
 # __checked_call should accept a second parameter
   given the c code "
@@ -492,6 +490,7 @@ given the c code "
       #include <grapes/util.h>
       int func (void) { return 0; }
       int main (void) {
+        __returns_int;
         __checked_call(0 == func(),
           printf(\"executed\\n\");
         );
@@ -511,6 +510,7 @@ given the c code "
       #include <grapes/util.h>
       int func (void) { return 1; }
       int main (void) {
+        __returns_int;
         __checked_call(0 == func(),
           printf(\"executed\\n\");
         );
@@ -519,7 +519,7 @@ given the c code "
   when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -DDEBUG -lgrapes"
   then it should return 0
   when I run
-  then I should see "a.out:<stdin>:8: error: 0 == func()"
+  then I should see "a.out:<stdin>:9: error: checked call failed: 0 == func()"
   and I should see "executed"
   and it should not return 0
 
