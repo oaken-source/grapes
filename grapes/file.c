@@ -63,8 +63,6 @@ file_map (const char *filename, size_t *length)
 int
 file_unmap (void *data, size_t length)
 {
-  __returns_int;
-
   if (data && (data != file_map_empty))
     __checked_call(0 == munmap(data, length));
 

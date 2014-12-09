@@ -34,7 +34,6 @@ given the c code "
 given the c code "
     #include <grapes/util.h>
     int main (void) {
-      __returns_int;
       int some_variable = 1;
       __precondition(1 == some_variable);
       return 0;
@@ -48,7 +47,6 @@ given the c code "
 given the c code "
     #include <grapes/util.h>
     int main (void) {
-      __returns_int;
       int some_variable = 1;
       __precondition(1 == some_variable);
       return 0;
@@ -62,7 +60,6 @@ given the c code "
 given the c code "
     #include <grapes/util.h>
     int main (void) {
-      __returns_int;
       int some_variable = 0;
       __precondition(1 == some_variable);
       return 0;
@@ -76,7 +73,6 @@ given the c code "
 given the c code "
     #include <grapes/util.h>
     int main (void) {
-      __returns_int;
       int some_variable = 0;
       __precondition(1 == some_variable);
       return 0;
@@ -84,7 +80,7 @@ given the c code "
   when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -DDEBUG -lgrapes"
   then it should return 0
   when I run
-  then I should see "a.out:<stdin>:6: error: precondition failed: 1 == some_variable"
+  then I should see "a.out:<stdin>:5: error: precondition failed: 1 == some_variable"
   and it should not return 0
 # __precondition should behave the same in a function returning a pointer type
 given the c code "
@@ -167,7 +163,6 @@ given the c code "
     #include <grapes/util.h>
     #include <stdio.h>
     int func(void) {
-      __returns_int;
       int some_variable = 1;
       __precondition(ENOSYS, 1 == some_variable);
       return 0;
@@ -191,7 +186,6 @@ given the c code "
     #include <grapes/util.h>
     #include <stdio.h>
     int func(void) {
-      __returns_int;
       int some_variable = 1;
       __precondition(ENOSYS, 1 == some_variable);
       return 0;
@@ -215,7 +209,6 @@ given the c code "
     #include <grapes/util.h>
     #include <stdio.h>
     int func(void) {
-      __returns_int;
       int some_variable = 0;
       __precondition(ENOSYS, 1 == some_variable);
       return 0;
@@ -239,7 +232,6 @@ given the c code "
     #include <grapes/util.h>
     #include <stdio.h>
     int func(void) {
-      __returns_int;
       int some_variable = 0;
       __precondition(ENOSYS, 1 == some_variable);
       return 0;
@@ -253,7 +245,7 @@ given the c code "
   when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -DDEBUG -lgrapes"
   then it should return 0
   when I run
-  then I should see "a.out:<stdin>:7: error: precondition failed: 1 == some_variable"
+  then I should see "a.out:<stdin>:6: error: precondition failed: 1 == some_variable"
   and I should see "message: Function not implemented"
   and it should not return 0
 # the same shold happen in a function returning a pointer type
@@ -357,7 +349,6 @@ given the c code "
     #include <grapes/util.h>
     int func (void) { return 0; }
     int main (void) {
-      __returns_int;
       __checked_call(0 == func());
       return 0;
     }"
@@ -371,7 +362,6 @@ given the c code "
     #include <grapes/util.h>
     int func (void) { return 0; }
     int main (void) {
-      __returns_int;
       __checked_call(0 == func());
       return 0;
     }"
@@ -385,7 +375,6 @@ given the c code "
     #include <grapes/util.h>
     int func (void) { return 1; }
     int main (void) {
-      __returns_int;
       __checked_call(0 == func());
       return 0;
     }"
@@ -399,14 +388,13 @@ given the c code "
     #include <grapes/util.h>
     int func (void) { return 1; }
     int main (void) {
-      __returns_int;
       __checked_call(0 == func());
       return 0;
     }"
   when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -DDEBUG -lgrapes"
   then it should return 0
   when I run
-  then I should see "a.out:<stdin>:6: error: checked call failed: 0 == func()"
+  then I should see "a.out:<stdin>:5: error: checked call failed: 0 == func()"
   and it should not return 0
 # __checked_call_ptr should behave like assert_inner_ptr
 given the c code "
@@ -490,7 +478,6 @@ given the c code "
       #include <grapes/util.h>
       int func (void) { return 0; }
       int main (void) {
-        __returns_int;
         __checked_call(0 == func(),
           printf(\"executed\\n\");
         );
@@ -510,7 +497,6 @@ given the c code "
       #include <grapes/util.h>
       int func (void) { return 1; }
       int main (void) {
-        __returns_int;
         __checked_call(0 == func(),
           printf(\"executed\\n\");
         );
@@ -519,7 +505,7 @@ given the c code "
   when I compile with cflags "-I${incdir} -L${libdir} -Wall -Wextra -Werror -DDEBUG -lgrapes"
   then it should return 0
   when I run
-  then I should see "a.out:<stdin>:9: error: checked call failed: 0 == func()"
+  then I should see "a.out:<stdin>:8: error: checked call failed: 0 == func()"
   and I should see "executed"
   and it should not return 0
 

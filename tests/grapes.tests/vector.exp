@@ -168,7 +168,6 @@ given the c code "
     #include <stdio.h>
     vector_declare(vec, unsigned int);
     int main (void) {
-      __returns_int;
       vec v;
       vector_init(&v);
       unsigned int i;

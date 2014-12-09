@@ -47,8 +47,8 @@ void feedback_error_at_line(const char *filename, unsigned int linenum, const ch
 
 /* miscellaneous helper macros, not to be used directly
  */
+static const typeof(-1) _assert_return = -1;
 #define __returns_ptr typeof(NULL) _assert_return = NULL
-#define __returns_int typeof(  -1) _assert_return =   -1
 #define _assert_generic(C, E, F, ...) \
     do { \
       if (__likely(C))  break; \
