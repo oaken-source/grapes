@@ -1,6 +1,6 @@
 
-set libdir $::env(libdir)
-set incdir $::env(incdir)
+set libdir $::env(test_libdir)
+set incdir $::env(test_incdir)
 
 set ::env(LD_LIBRARY_PATH) ${libdir}
 
@@ -80,23 +80,11 @@ given the c code "
   and it should return 0
 
 ### test the feedback_error function
-# it should print the error, and on EXIT_FAILURE should terminate
+# it should print the error message
 given the c code "
     #include <grapes/feedback.h>
     int main (void) {
-      feedback_error(EXIT_FAILURE, \"error_message: %u\", 1337);
-      return 0;
-    }"
-  when I compile with cflags "-I${incdir} -L${libdir} -Werror -lgrapes"
-  then it should return 0
-  when I run
-  then I should see "a.out: error: error_message: 1337"
-  and it should not return 0
-# on EXIT_SUCCESS, it should not terminate
-given the c code "
-    #include <grapes/feedback.h>
-    int main (void) {
-      feedback_error(EXIT_SUCCESS, \"error_message: %u\", 1337);
+      feedback_error(\"error_message: %u\", 1337);
       return 0;
     }"
   when I compile with cflags "-I${incdir} -L${libdir} -Werror -lgrapes"

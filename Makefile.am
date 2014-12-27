@@ -53,10 +53,9 @@ EXTRA_DIST = \
   tests/grapes.tests/util.exp \
   tests/leakcheck.tests/leakcheck.exp
 
-RUNTESTFLAGS = --srcdir $(top_srcdir)/tests/
-
-DEJAGNU  = $(top_srcdir)/tests/asparagus.exp
-DEJATOOL = grapes
+RUNTESTFLAGS  = --srcdir $(top_srcdir)/tests/
+DEJAGNU       = $(top_srcdir)/tests/asparagus.exp
+DEJATOOL      = grapes
 
 test_libdir   = $(top_builddir)/grapes/.libs/
 test_incdir   = $(top_srcdir)

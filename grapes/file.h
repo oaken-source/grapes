@@ -44,7 +44,8 @@
  *   length - a pointer where the size of the allocation is stored in
  *
  * errors:
- *   may fail and set errno for the same reasons as open, fstat and mmap
+ *   may fail and set errno for the same reasons as open, close, fstat and
+ *   mmap.
  *   the behaviour is undefined if the length poiner is invalid
  *
  * returns:

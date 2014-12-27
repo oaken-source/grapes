@@ -51,7 +51,7 @@ feedback_error_at_line (const char *filename, unsigned int linenum, const char *
 }
 
 void
-feedback_error (int status, const char *format, ...)
+feedback_error (const char *format, ...)
 {
   int errnum = errno;
 
@@ -67,10 +67,7 @@ feedback_error (int status, const char *format, ...)
 
   fprintf(stderr, "\n");
 
-  if(status != EXIT_SUCCESS)
-    exit(status);
-
-  errno = 0;
+  errno = errnum;
 }
 
 void

@@ -43,7 +43,7 @@
  *   ... - the parameters passed to feedback_error
  */
 #define feedback_assert(COND, ...) \
-    do { if(!(COND)) feedback_error(EXIT_FAILURE, __VA_ARGS__); } while (0)
+    do { if(!(COND)) { feedback_error(__VA_ARGS__); exit(EXIT_FAILURE); } } while (0)
 
 /* convenience assertion macro - if the given condition is false, print a
  * formatted warning string to stderr using feedback_warning
@@ -69,13 +69,11 @@ void feedback_error_at_line(const char *filename, unsigned int linenum, const ch
 /* prints a formatted error string to stderr, prepends the string contained
  * in the variable program_invocation_short_name provided by glibc, if
  * available, and if errno != 0 appends the appropriate string representation.
- * terminates the program if status != EXIT_SUCCESS
  *
  * params:
- *   status - the parameter to exit() if != EXIT_SUCCESS
  *   format, ... - the formatted error string
  */
-void feedback_error(int status, const char *format, ...);
+void feedback_error(const char *format, ...);
 
 /* prints a formatted warning string to stderr, prepends the string contained
  * in the variable program_invocation_short_name provided by glibc, if

@@ -1,6 +1,6 @@
 
-set libdir $::env(libdir)
-set incdir $::env(incdir)
+set libdir $::env(test_libdir)
+set incdir $::env(test_incdir)
 
 set ::env(LD_LIBRARY_PATH) ${libdir}
 
