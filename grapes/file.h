@@ -41,12 +41,13 @@
  *
  * params:
  *   filename - the path to the file to map
- *   length - a pointer where the size of the allocation is stored in
+ *   length - a pointer to where the size of the allocation is stored
  *
  * errors:
- *   may fail and set errno for the same reasons as open, close, fstat and
- *   mmap.
- *   the behaviour is undefined if the length poiner is invalid
+ *   EINVAL - the passed filename or length pointer is invalid
+ *
+ *   may also fail and set errno for the same reasons as open, close, fstat
+ *   and mmap.
  *
  * returns:
  *   a pointer to the mapped area, if successful, NULL otherwise

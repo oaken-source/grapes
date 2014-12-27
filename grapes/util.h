@@ -102,13 +102,15 @@ static const typeof(-1) _assert_return = -1;
 
 /* convenience attribute shortcuts with semantic sugar */
 #ifdef __GNUC__
-#  define __may_fail    __attribute__((warn_unused_result))
-#  define __unused      __attribute__((unused))
-#  define __debug_func  __attribute__((deprecated))
+#  define __may_fail        __attribute__((warn_unused_result))
+#  define __unused          __attribute__((unused))
+#  define __debug_func      __attribute__((deprecated))
+#  define __format(F, I, S) __attribute__((format(F, I, S)))
 #else
 #  define __may_fail
 #  define __unused
 #  define __debug_func
+#  define __format
 #endif
 
 /* branch optimization macros */

@@ -19,7 +19,7 @@ given the c code "
     main (void)
     {
       int e = 1337;
-      feedback_error(EXIT_SUCCESS, \"error_message: %u\", e++);
+      feedback_error(\"error_message: %u\", e++);
       feedback_warning(\"warning_message: %u\", e++);
       feedback_error_at_line(__FILE__, __LINE__, \"error_message: %u\", e++);
 

@@ -60,11 +60,11 @@
  * macros defined in util.h
  *
  * params:
- *   filename - the name of the file where the error lies (usually __FILE__)
- *   linenum - the line index of the error (usually __LINE__)
+ *   file - the name of the file where the error lies (usually __FILE__)
+ *   line - the line index of the error (usually __LINE__)
  *   format, ... - the formatted error string
  */
-void feedback_error_at_line(const char *filename, unsigned int linenum, const char *format, ...);
+void feedback_error_at_line(const char *file, unsigned int line, const char *format, ...) __format(printf, 3, 4);
 
 /* prints a formatted error string to stderr, prepends the string contained
  * in the variable program_invocation_short_name provided by glibc, if
@@ -73,7 +73,7 @@ void feedback_error_at_line(const char *filename, unsigned int linenum, const ch
  * params:
  *   format, ... - the formatted error string
  */
-void feedback_error(const char *format, ...);
+void feedback_error(const char *format, ...) __format(printf, 1, 2);
 
 /* prints a formatted warning string to stderr, prepends the string contained
  * in the variable program_invocation_short_name provided by glibc, if
@@ -82,5 +82,5 @@ void feedback_error(const char *format, ...);
  * params:
  *   format, ... - the formatted warning string
  */
-void feedback_warning(const char *format, ...);
+void feedback_warning(const char *format, ...) __format(printf, 1, 2);
 
