@@ -92,4 +92,3 @@ feedback_warning (const char *format, ...)
 
   errno = errnum;
 }
-

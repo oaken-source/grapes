@@ -22,8 +22,6 @@ AX_ALLOW_DEBUG
 LT_INIT
 
 AC_CONFIG_FILES([Makefile
-		 grapes/Makefile
-		 docs/Makefile
-		 tests/Makefile])
+		 docs/Makefile])
 
 AC_OUTPUT

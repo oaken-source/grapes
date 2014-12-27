@@ -6,7 +6,7 @@ proc when_I_run_through_profiler { } {
 
   set asparagus_spawn_id ""
 
-  if { [ catch { spawn "graprof" $asparagus_executable_path } msg ] } {
+  if { [ catch { spawn "graprof" -FCM $asparagus_executable_path } msg ] } {
     fail_step "$msg"
     return
   }

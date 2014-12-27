@@ -17,9 +17,10 @@ m4/l*
 
 .deps
 .libs
+.dirstamp
 
-**/Makefile
-**/Makefile.in
+Makefile
+Makefile.in
 
 # runtest generated files
 *.log

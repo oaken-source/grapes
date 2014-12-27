@@ -19,57 +19,6 @@
  ******************************************************************************/
 
 
-#include "file.h"
+#include "util.h"
 
-#include "util.h" // <grapes/util.h>
-
-#include <fcntl.h>
-#include <unistd.h>
-#include <sys/stat.h>
-#include <sys/mman.h>
-
-const char *file_map_empty = "";
-
-void*
-file_map (const char *filename, size_t *length)
-{
-  __returns_ptr;
-
-  __precondition(EINVAL, NULL != filename);
-  __precondition(EINVAL, NULL != length);
-
-  int fd;
-  struct stat sb;
-  void *data;
-
-  *length = 0;
-
-  __checked_call(-1 != (fd = open(filename, O_RDONLY)));
-
-  __checked_section
-    (
-      __section_call(-1 != fstat(fd, &sb));
-
-      if (sb.st_size == 0)
-        return (void*)file_map_empty;
-
-      __section_call(MAP_FAILED != (data = mmap(NULL, sb.st_size, PROT_READ, MAP_PRIVATE, fd, 0)));
-    )
-
-  __checked_call(0 == close(fd));
-
-  __on_failure_return;
-
-  *length = sb.st_size;
-  return data;
-}
-
-int
-file_unmap (void *data, size_t length)
-{
-  if (data && (data != file_map_empty))
-    __checked_call(0 == munmap(data, length));
-
-  return 0;
-}
-
+int __checked_call_failed = 0;
