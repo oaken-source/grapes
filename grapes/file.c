@@ -21,7 +21,7 @@
 
 #include "file.h"
 
-#include "util.h" // <grapes/util.h>
+#include "util.h" // local version of <grapes/util.h>
 
 #include <fcntl.h>
 #include <unistd.h>
@@ -46,19 +46,18 @@ file_map (const char *filename, size_t *length)
 
   __checked_call(-1 != (fd = open(filename, O_RDONLY)));
 
-  __checked_section
-    (
-      __section_call(-1 != fstat(fd, &sb));
+  __checked_call(-1 != fstat(fd, &sb),
+    close(fd);
+  );
 
-      if (sb.st_size == 0)
-        return (void*)file_map_empty;
+  if (sb.st_size == 0)
+    return (void*)file_map_empty;
 
-      __section_call(MAP_FAILED != (data = mmap(NULL, sb.st_size, PROT_READ, MAP_PRIVATE, fd, 0)));
-    )
+  __checked_call(MAP_FAILED != (data = mmap(NULL, sb.st_size, PROT_READ, MAP_PRIVATE, fd, 0)),
+    close(fd);
+  );
 
   __checked_call(0 == close(fd));
-
-  __on_failure_return;
 
   *length = sb.st_size;
   return data;

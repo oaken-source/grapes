@@ -21,7 +21,7 @@
 
 #include "feedback.h"
 
-#include "util.h" // <grapes/util.h>
+#include "util.h" // local version of <grapes/util.h>
 
 #include <stdarg.h>
 #include <stdio.h>

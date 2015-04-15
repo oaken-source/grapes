@@ -122,29 +122,3 @@ static const typeof(-1) _assert_return = -1;
 #  define __unlikely(X) (X)
 #endif
 
-
-/* experimental stuff */
-#define __checked_section(F) \
-    do { \
-      __label__ __checked_call_end; \
-      __checked_call_failed = 0; \
-      F \
-      __checked_call_end: __unused; \
-    } while (0);
-
-#define __on_failure(F) \
-    do { \
-      if (__checked_call_failed) { F } \
-    } while (0);
-
-#define __on_failure_return __on_failure(return _assert_return;)
-
-#define __section_call(C) \
-    do { \
-      if (__likely(C)) break; \
-      if (DEBUG) feedback_error_at_line(__FILE__, __LINE__, "checked call failed: %s", # C); \
-      __checked_call_failed = 1; \
-      goto __checked_call_end; \
-    } while (0)
-
-extern int __checked_call_failed;

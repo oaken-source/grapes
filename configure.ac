@@ -1,6 +1,4 @@
 
-dnl process this file with autoconf to procude configure script
-
 AC_PREREQ([2.69])
 AC_INIT([grapes], [0.1.1], [andreas@grapentin.org])
 AC_CONFIG_SRCDIR([grapes/util.h])
@@ -26,6 +24,6 @@ PKG_INSTALLDIR([/usr/lib/pkgconfig])
 AC_CONFIG_FILES([
   grapes.pc
   Makefile
-  docs/Makefile])
+])
 
 AC_OUTPUT

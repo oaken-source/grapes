@@ -29,10 +29,10 @@
 
 #include <stdlib.h>
 
-/* this macro create and typedef's a vector struct of the given name and type
+/* this macro creates and typedef's a vector struct of the given name and type
  * to be used with the generic vector_* functions below. This is similar to
  * C++'s template classes.
- * The created struct will have the name vector_ ## NAME and be typedef's to
+ * The created struct will have the name vector_ ## NAME and be typedef'd to
  * NAME.
  *
  * You are not supposed to alter the values inside the struct yourself, but
@@ -91,7 +91,7 @@
  *   may fail and set errno for the same reasons as realloc
  *
  * returns:
- *   -1 on failure, 0 on success
+ *   evluates to -1 on failure, 0 on success
  */
 #define vector_push(V, ITEM) \
     ( \
