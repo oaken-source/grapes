@@ -30,7 +30,7 @@ source [file dirname [info script]]/lib/globals.tcl
 source [file dirname [info script]]/steps/dispatcher.tcl
 
 # include custom steps
-source [file dirname [info script]]/steps/custom.tcl
+catch { source [file dirname [info script]]/steps/custom.tcl }
 
 # include the default step definitions
 source [file dirname [info script]]/steps/default.tcl
