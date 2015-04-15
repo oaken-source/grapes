@@ -22,6 +22,8 @@ m4/l*
 Makefile
 Makefile.in
 
+*.pc
+
 # runtest generated files
 *.log
 *.sum

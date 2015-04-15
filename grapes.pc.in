@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=${prefix}/include
+
+Name: grapes
+Description: a convenience library to unify common tasks
+Version: @VERSION@
+Libs: -L${libdir} -lgrapes
+Cflags: -I${includedir}

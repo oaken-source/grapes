@@ -38,6 +38,9 @@ grapes_libgrapes_gp_la_CFLAGS = -finstrument-functions -g
 
 endif ## PROFILING
 
+## pkgconfig integration
+pkgconfig_DATA = grapes.pc
+
 ## tests
 
 AUTOMAKE_OPTIONS += dejagnu

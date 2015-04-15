@@ -21,7 +21,11 @@ AX_ALLOW_DEBUG
 
 LT_INIT
 
-AC_CONFIG_FILES([Makefile
-		 docs/Makefile])
+PKG_INSTALLDIR([/usr/lib/pkgconfig])
+
+AC_CONFIG_FILES([
+  grapes.pc
+  Makefile
+  docs/Makefile])
 
 AC_OUTPUT
