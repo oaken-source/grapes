@@ -29,3 +29,6 @@ Makefile.in
 *.sum
 site.*
 graprof.out
+
+# local helper scripts
+integrate.sh

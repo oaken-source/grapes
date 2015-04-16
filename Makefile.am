@@ -36,12 +36,12 @@ pkgconfig_DATA = grapes.pc
 ## tests
 
 # this is what I would like to have
-# dist_asparagus_TESTS = \
-#   tests/grapes.tests \
-#   tests/leakcheck.tests
+#asparagus_TESTS = \
+#  tests/grapes.tests \
+#  tests/leakcheck.tests
 #
-# dist_asparagus_EXTRA_STEPS = \
-#   tests/steps/custom.tcl
+#asparagus_EXTRA_STEPS = \
+#  tests/steps/custom.tcl
 
 # this is what I need to use for now
 AUTOMAKE_OPTIONS += dejagnu
