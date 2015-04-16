@@ -30,28 +30,35 @@ grapes_libgrapes_la_CFLAGS   = -finstrument-functions -g
 endif ## PROFILING
 
 ## pkgconfig integration
+pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = grapes.pc
 
 ## tests
 
+# this is what I would like to have
+# dist_asparagus_TESTS = \
+#   tests/grapes.tests \
+#   tests/leakcheck.tests
+#
+# dist_asparagus_EXTRA_STEPS = \
+#   tests/steps/custom.tcl
+
+# this is what I need to use for now
 AUTOMAKE_OPTIONS += dejagnu
 
 EXTRA_DIST = \
-  tests/asparagus.exp \
-  tests/lib \
-  tests/steps \
-  tests/static \
   tests/grapes.tests \
   tests/leakcheck.tests
 
 RUNTESTFLAGS  = --srcdir $(top_srcdir)/tests/
-DEJAGNU       = $(top_srcdir)/tests/asparagus.exp
 DEJATOOL      = grapes
+
+ASPARAGUS_EXTRA_STEPS = tests/steps/custom.tcl
 
 test_libdir   = $(top_builddir)/grapes/.libs/
 test_incdir   = $(top_srcdir)
 
-export DEJAGNU test_libdir test_incdir
+export ASPARAGUS_EXTRA_STEPS DEJAGNU test_libdir test_incdir
 
 if PROFILING
 

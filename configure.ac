@@ -8,6 +8,8 @@ AC_CONFIG_MACRO_DIR([m4])
 
 AC_SUBST([AM_CFLAGS], [])
 
+AX_CHECK_ASPARAGUS
+
 AM_INIT_AUTOMAKE([-Wall -Werror gnu])
 
 AC_PROG_CC
@@ -18,8 +20,6 @@ AX_ALLOW_PROFILING
 AX_ALLOW_DEBUG
 
 LT_INIT
-
-PKG_INSTALLDIR([/usr/lib/pkgconfig])
 
 AC_CONFIG_FILES([
   grapes.pc
